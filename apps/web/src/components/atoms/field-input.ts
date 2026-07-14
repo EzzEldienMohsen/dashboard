@@ -21,4 +21,4 @@ export interface BaseFieldInputProps {
 }
 
 export const fieldInputBaseClassName =
-  "w-full rounded-field border bg-neutral-50 px-3.5 py-2.5 text-body text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-brand-600 focus:ring-2 focus:ring-brand-400/40 disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full rounded-field border bg-base-100 px-3.5 py-2.5 text-body text-base-content outline-none transition-colors placeholder:text-base-content/40 focus:border-primary focus:ring-2 focus:ring-primary/40 disabled:cursor-not-allowed disabled:opacity-60";

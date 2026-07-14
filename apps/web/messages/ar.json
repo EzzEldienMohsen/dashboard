@@ -1,0 +1,86 @@
+{
+  "common": {
+    "theme": {
+      "switchToLight": "التبديل إلى الوضع الفاتح",
+      "switchToDark": "التبديل إلى الوضع الداكن"
+    },
+    "language": {
+      "label": "اللغة"
+    }
+  },
+  "auth": {
+    "login": {
+      "metaTitle": "تسجيل الدخول",
+      "metaDescription": "سجّل الدخول إلى حساب لوحة تحكم المدرسة الخاص بك.",
+      "title": "مرحبًا بعودتك",
+      "subtitle": "سجّل الدخول لإدارة لوحة تحكم مدرستك.",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "noAccount": "ليس لديك حساب؟",
+      "createAccount": "أنشئ حسابًا"
+    },
+    "register": {
+      "metaTitle": "إنشاء حساب",
+      "metaDescription": "أنشئ حساب لوحة تحكم المدرسة كمدير أو معلم.",
+      "title": "أنشئ حسابك",
+      "subtitle": "قم بإعداد الوصول كمدير أو معلم.",
+      "loadingCountries": "جارٍ تحميل الدول…",
+      "roleLabel": "أنا",
+      "roleManager": "مدير",
+      "roleTeacher": "معلم",
+      "nameLabel": "الاسم الكامل",
+      "namePlaceholder": "مثال: أحمد علي",
+      "emailLabel": "البريد الإلكتروني",
+      "emailPlaceholder": "you@example.com",
+      "phoneLabel": "الهاتف",
+      "phonePlaceholder": "+1 555 000 1234",
+      "countryLabel": "الدولة",
+      "countryPlaceholder": "اختر دولة",
+      "passwordLabel": "كلمة المرور",
+      "confirmPasswordLabel": "تأكيد كلمة المرور",
+      "submit": "إنشاء حساب",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "logIn": "تسجيل الدخول"
+    },
+    "error": {
+      "title": "حدث خطأ ما",
+      "message": "تعذّر تحميل هذا النموذج. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "passwordInput": {
+      "show": "إظهار",
+      "hide": "إخفاء",
+      "showAriaLabel": "إظهار كلمة المرور",
+      "hideAriaLabel": "إخفاء كلمة المرور"
+    },
+    "passwordStrength": {
+      "length": "8 أحرف على الأقل",
+      "upper": "حرف كبير واحد",
+      "lower": "حرف صغير واحد",
+      "digit": "رقم واحد"
+    },
+    "validation": {
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "roleRequired": "اختر دورًا",
+      "nameRequired": "الاسم مطلوب",
+      "nameTooLong": "الاسم طويل جدًا",
+      "countryRequired": "الدولة مطلوبة",
+      "countryTooLong": "اسم الدولة طويل جدًا",
+      "passwordsMustMatch": "كلمتا المرور غير متطابقتين",
+      "phoneInvalid": "يجب أن يكون رقم الهاتف صالحًا",
+      "passwordMinLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+      "passwordMaxLength": "يجب ألا تتجاوز كلمة المرور 72 حرفًا",
+      "passwordComplexity": "يجب أن تحتوي كلمة المرور على حرف كبير وحرف صغير ورقم واحد على الأقل"
+    },
+    "apiErrors": {
+      "networkError": "تعذّر الوصول إلى الخادم. يرجى المحاولة مرة أخرى.",
+      "rateLimited": "محاولات كثيرة جدًا. يرجى الانتظار دقيقة والمحاولة مرة أخرى.",
+      "emailExists": "يوجد حساب بهذا البريد الإلكتروني بالفعل",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+      "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+    }
+  }
+}

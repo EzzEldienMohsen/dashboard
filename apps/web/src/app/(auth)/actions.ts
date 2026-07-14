@@ -3,7 +3,8 @@
 import { z } from "zod";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { loginSchema, registerSchema } from "@/lib/validation/auth.schema";
+import { getTranslations } from "next-intl/server";
+import { createLoginSchema, createRegisterSchema } from "@/lib/validation/auth.schema";
 import { authApiClient } from "@/lib/auth/auth-api-client";
 import { mapAuthApiFailureToActionState } from "@/lib/auth/map-auth-api-result";
 import type { AuthActionState } from "./action-state";
@@ -37,6 +38,8 @@ export async function registerAction(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
+  const t = await getTranslations("auth.validation");
+  const registerSchema = createRegisterSchema(t);
   const parsed = registerSchema.safeParse({
     role: formData.get("role"),
     name: formData.get("name"),
@@ -52,7 +55,10 @@ export async function registerAction(
   }
 
   const result = await authApiClient.register(parsed.data);
-  if (!result.ok) return mapAuthApiFailureToActionState(result);
+  if (!result.ok) {
+    const tErrors = await getTranslations("auth.apiErrors");
+    return mapAuthApiFailureToActionState(result, tErrors);
+  }
 
   await establishSession(result.accessToken);
   redirect(POST_AUTH_REDIRECT);
@@ -62,6 +68,8 @@ export async function loginAction(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
+  const t = await getTranslations("auth.validation");
+  const loginSchema = createLoginSchema(t);
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -72,7 +80,10 @@ export async function loginAction(
   }
 
   const result = await authApiClient.login(parsed.data);
-  if (!result.ok) return mapAuthApiFailureToActionState(result);
+  if (!result.ok) {
+    const tErrors = await getTranslations("auth.apiErrors");
+    return mapAuthApiFailureToActionState(result, tErrors);
+  }
 
   await establishSession(result.accessToken);
   redirect(POST_AUTH_REDIRECT);

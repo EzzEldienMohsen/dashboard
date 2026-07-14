@@ -1,0 +1,86 @@
+{
+  "common": {
+    "theme": {
+      "switchToLight": "Switch to light theme",
+      "switchToDark": "Switch to dark theme"
+    },
+    "language": {
+      "label": "Language"
+    }
+  },
+  "auth": {
+    "login": {
+      "metaTitle": "Log In",
+      "metaDescription": "Log in to your School Dashboard account.",
+      "title": "Welcome back",
+      "subtitle": "Log in to manage your school dashboard.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "submit": "Log in",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create one"
+    },
+    "register": {
+      "metaTitle": "Create an Account",
+      "metaDescription": "Create a School Dashboard account as a manager or teacher.",
+      "title": "Create your account",
+      "subtitle": "Set up access as a manager or teacher.",
+      "loadingCountries": "Loading countries…",
+      "roleLabel": "I am a",
+      "roleManager": "Manager",
+      "roleTeacher": "Teacher",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Jane Doe",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "+1 555 000 1234",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Select a country",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm password",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "logIn": "Log in"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "message": "We couldn't load this form. Please try again.",
+      "retry": "Try again"
+    },
+    "passwordInput": {
+      "show": "Show",
+      "hide": "Hide",
+      "showAriaLabel": "Show password",
+      "hideAriaLabel": "Hide password"
+    },
+    "passwordStrength": {
+      "length": "At least 8 characters",
+      "upper": "One uppercase letter",
+      "lower": "One lowercase letter",
+      "digit": "One number"
+    },
+    "validation": {
+      "emailInvalid": "Enter a valid email address",
+      "passwordRequired": "Password is required",
+      "roleRequired": "Select a role",
+      "nameRequired": "Name is required",
+      "nameTooLong": "Name is too long",
+      "countryRequired": "Country is required",
+      "countryTooLong": "Country is too long",
+      "passwordsMustMatch": "Passwords must match",
+      "phoneInvalid": "Phone must be a valid phone number",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordMaxLength": "Password must be at most 72 characters",
+      "passwordComplexity": "Password must contain at least one uppercase letter, one lowercase letter, and one digit"
+    },
+    "apiErrors": {
+      "networkError": "Unable to reach the server. Please try again.",
+      "rateLimited": "Too many attempts. Please wait a minute and try again.",
+      "emailExists": "An account with this email already exists",
+      "invalidCredentials": "Invalid email or password",
+      "generic": "Something went wrong. Please try again."
+    }
+  }
+}

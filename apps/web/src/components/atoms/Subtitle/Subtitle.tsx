@@ -13,7 +13,7 @@ export function Subtitle({
   className,
 }: SubtitleProps) {
   return (
-    <Tag className={cn("text-subtitle text-neutral-600", className)}>
+    <Tag className={cn("text-subtitle text-base-content/70", className)}>
       {children}
     </Tag>
   );

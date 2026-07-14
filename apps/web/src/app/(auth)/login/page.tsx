@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AuthPageTemplate } from "@/components/templates/AuthPageTemplate";
 import { LoginForm } from "@/components/organisms/LoginForm";
 import { loginAction } from "../actions";
@@ -7,25 +8,30 @@ import { initialAuthActionState } from "../action-state";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
 
-export const metadata: Metadata = {
-  title: "Log In",
-  description: "Log in to your School Dashboard account.",
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth.login");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    robots: { index: true, follow: true },
+  };
+}
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: "Log In",
-  url: `${SITE_URL}/login`,
-  isPartOf: {
-    "@type": "WebSite",
-    name: "School Dashboard",
-    url: SITE_URL,
-  },
-};
+export default async function LoginPage() {
+  const t = await getTranslations("auth.login");
 
-export default function LoginPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: t("metaTitle"),
+    url: `${SITE_URL}/login`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "School Dashboard",
+      url: SITE_URL,
+    },
+  };
+
   return (
     <>
       <script
@@ -33,13 +39,13 @@ export default function LoginPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <AuthPageTemplate
-        title="Welcome back"
-        subtitle="Log in to manage your school dashboard."
+        title={t("title")}
+        subtitle={t("subtitle")}
         footerSlot={
           <>
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-medium text-brand-600 hover:underline">
-              Create one
+            {t("noAccount")}{" "}
+            <Link href="/register" className="font-medium text-primary hover:underline">
+              {t("createAccount")}
             </Link>
           </>
         }

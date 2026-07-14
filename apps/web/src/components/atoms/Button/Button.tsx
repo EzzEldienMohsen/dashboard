@@ -8,10 +8,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-brand-600 text-white hover:bg-brand-700",
+        primary: "bg-primary text-primary-content hover:bg-primary/90",
         secondary:
-          "border border-neutral-200 bg-neutral-50 text-neutral-900 hover:bg-neutral-100",
-        ghost: "text-brand-600 hover:bg-brand-50",
+          "border border-base-300 bg-base-100 text-base-content hover:bg-base-200",
+        ghost: "text-primary hover:bg-primary/10",
       },
     },
     defaultVariants: {

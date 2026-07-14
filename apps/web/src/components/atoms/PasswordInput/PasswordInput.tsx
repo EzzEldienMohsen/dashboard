@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   fieldInputBaseClassName,
   type BaseFieldInputProps,
@@ -12,6 +13,7 @@ export type PasswordInputProps = BaseFieldInputProps;
 export function PasswordInput({ invalid, ...rest }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
   const toggleId = useId();
+  const t = useTranslations("auth.passwordInput");
 
   return (
     <div className="relative">
@@ -19,10 +21,10 @@ export function PasswordInput({ invalid, ...rest }: PasswordInputProps) {
         type={visible ? "text" : "password"}
         className={cn(
           fieldInputBaseClassName,
-          "pr-11",
+          "pe-11",
           invalid &&
-            "border-danger-500 focus:border-danger-500 focus:ring-danger-500/30",
-          !invalid && "border-neutral-200",
+            "border-error focus:border-error focus:ring-error/30",
+          !invalid && "border-base-300",
         )}
         aria-invalid={invalid || undefined}
         {...rest}
@@ -31,11 +33,11 @@ export function PasswordInput({ invalid, ...rest }: PasswordInputProps) {
         type="button"
         id={toggleId}
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Hide password" : "Show password"}
+        aria-label={visible ? t("hideAriaLabel") : t("showAriaLabel")}
         aria-pressed={visible}
-        className="absolute inset-y-0 right-0 flex items-center px-3 text-small text-neutral-600 hover:text-neutral-900"
+        className="absolute inset-y-0 end-0 flex items-center px-3 text-small text-base-content/70 hover:text-base-content"
       >
-        {visible ? "Hide" : "Show"}
+        {visible ? t("hide") : t("show")}
       </button>
     </div>
   );

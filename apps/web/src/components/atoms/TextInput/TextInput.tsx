@@ -20,8 +20,8 @@ export function TextInput({
       type={type}
       className={cn(
         fieldInputBaseClassName,
-        invalid && "border-danger-500 focus:border-danger-500 focus:ring-danger-500/30",
-        !invalid && "border-neutral-200",
+        invalid && "border-error focus:border-error focus:ring-error/30",
+        !invalid && "border-base-300",
         className,
       )}
       aria-invalid={invalid || undefined}

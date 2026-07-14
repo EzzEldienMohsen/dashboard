@@ -11,7 +11,7 @@ export function Title({ as: Tag = "h1", children, className }: TitleProps) {
   return (
     <Tag
       className={cn(
-        "text-title font-semibold text-neutral-900 tracking-title",
+        "text-title font-semibold text-base-content tracking-title",
         className,
       )}
     >

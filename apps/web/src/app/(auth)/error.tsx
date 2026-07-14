@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { useTranslations } from "next-intl";
 import { Title } from "@/components/atoms/Title";
 import { Subtitle } from "@/components/atoms/Subtitle";
 import { Button } from "@/components/atoms/Button";
@@ -13,22 +14,22 @@ export default function AuthError({
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  const t = useTranslations("auth.error");
+
   useEffect(() => {
     Sentry.captureException(error);
   }, [error]);
 
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center bg-neutral-100 px-[4%] py-12">
+    <div className="flex min-h-full flex-1 items-center justify-center bg-base-200 px-[4%] py-12">
       <div
-        className="flex w-full flex-col items-center gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-[6%] text-center shadow-sm"
+        className="flex w-full flex-col items-center gap-4 rounded-2xl border border-base-300 bg-base-100 p-[6%] text-center shadow-sm"
         style={{ maxWidth: "min(92%, 28rem)" }}
       >
-        <Title as="h1">Something went wrong</Title>
-        <Subtitle as="p">
-          We couldn&apos;t load this form. Please try again.
-        </Subtitle>
+        <Title as="h1">{t("title")}</Title>
+        <Subtitle as="p">{t("message")}</Subtitle>
         <Button onClick={() => unstable_retry()} className="w-auto px-6">
-          Try again
+          {t("retry")}
         </Button>
       </div>
     </div>

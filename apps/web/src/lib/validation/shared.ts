@@ -1,22 +1,28 @@
 import { z } from "zod";
 
+type Translator = (key: string) => string;
+
 /**
  * Kept byte-for-byte identical to PHONE_REGEX in
  * apps/api/src/auth/dto/register.dto.ts — update both together.
+ * A factory rather than a static schema because the error message needs
+ * the caller's locale, resolved at request time, not at module load.
  */
-export const phoneSchema = z
-  .string()
-  .regex(/^\+?[0-9\s-]{7,20}$/, "Phone must be a valid phone number");
+export function createPhoneSchema(t: Translator) {
+  return z.string().regex(/^\+?[0-9\s-]{7,20}$/, t("phoneInvalid"));
+}
 
 /**
  * Kept byte-for-byte identical to PASSWORD_COMPLEXITY_REGEX in
  * apps/api/src/auth/dto/register.dto.ts — update both together.
  */
-export const passwordSchema = z
-  .string()
-  .min(8, "Password must be at least 8 characters")
-  .max(72, "Password must be at most 72 characters")
-  .regex(
-    /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-    "Password must contain at least one uppercase letter, one lowercase letter, and one digit",
-  );
+export function createPasswordSchema(t: Translator) {
+  return z
+    .string()
+    .min(8, t("passwordMinLength"))
+    .max(72, t("passwordMaxLength"))
+    .regex(
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      t("passwordComplexity"),
+    );
+}

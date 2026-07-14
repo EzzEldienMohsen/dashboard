@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { FormField } from "@/components/molecules/FormField";
 import { RoleToggle } from "@/components/molecules/RoleToggle";
 import { TextInput } from "@/components/atoms/TextInput";
@@ -13,6 +14,21 @@ import type { AuthActionState } from "@/app/(auth)/action-state";
 import type { CountryOption } from "@/lib/countries";
 
 /**
+ * A named component (not an inline arrow) so it can call useTranslations()
+ * itself — next/dynamic's `loading` option renders it as a real component,
+ * and hooks only require being inside a component's render, not being
+ * declared inside RegisterForm specifically.
+ */
+function CountrySelectLoading() {
+  const t = useTranslations("auth.register");
+  return (
+    <div className={fieldInputBaseClassName} aria-hidden="true">
+      {t("loadingCountries")}
+    </div>
+  );
+}
+
+/**
  * Code-split: neither component is needed for the initial critical fields
  * (name/email/phone/password), so their client JS loads as separate chunks
  * instead of inflating RegisterForm's main bundle. Both keep ssr:true (the
@@ -21,13 +37,7 @@ import type { CountryOption } from "@/lib/countries";
  */
 const CountrySelect = dynamic(
   () => import("@/components/molecules/CountrySelect").then((m) => m.CountrySelect),
-  {
-    loading: () => (
-      <div className={fieldInputBaseClassName} aria-hidden="true">
-        Loading countries…
-      </div>
-    ),
-  },
+  { loading: CountrySelectLoading },
 );
 
 const PasswordStrengthHint = dynamic(
@@ -54,49 +64,55 @@ export function RegisterForm({
 }: RegisterFormProps) {
   const [state, formAction, pending] = useActionState(action, initialState);
   const [password, setPassword] = useState("");
+  const t = useTranslations("auth.register");
 
   return (
     <form action={formAction} className="flex flex-col gap-field-gap" noValidate>
-      <FormField name="role" label="I am a" error={state.fieldErrors?.role} required>
+      <FormField name="role" label={t("roleLabel")} error={state.fieldErrors?.role} required>
         <RoleToggle />
       </FormField>
 
-      <FormField name="name" label="Full name" error={state.fieldErrors?.name} required>
-        <TextInput id="name" name="name" autoComplete="name" placeholder="Jane Doe" />
+      <FormField name="name" label={t("nameLabel")} error={state.fieldErrors?.name} required>
+        <TextInput
+          id="name"
+          name="name"
+          autoComplete="name"
+          placeholder={t("namePlaceholder")}
+        />
       </FormField>
 
-      <FormField name="email" label="Email" error={state.fieldErrors?.email} required>
+      <FormField name="email" label={t("emailLabel")} error={state.fieldErrors?.email} required>
         <TextInput
           id="email"
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder={t("emailPlaceholder")}
         />
       </FormField>
 
-      <FormField name="phone" label="Phone" error={state.fieldErrors?.phone} required>
+      <FormField name="phone" label={t("phoneLabel")} error={state.fieldErrors?.phone} required>
         <TextInput
           id="phone"
           name="phone"
           type="tel"
           autoComplete="tel"
-          placeholder="+1 555 000 1234"
+          placeholder={t("phonePlaceholder")}
         />
       </FormField>
 
       <FormField
         name="country"
-        label="Country"
+        label={t("countryLabel")}
         error={state.fieldErrors?.country}
         required
       >
-        <CountrySelect options={countryOptions} />
+        <CountrySelect options={countryOptions} placeholder={t("countryPlaceholder")} />
       </FormField>
 
       <FormField
         name="password"
-        label="Password"
+        label={t("passwordLabel")}
         error={state.fieldErrors?.password}
         required
       >
@@ -111,7 +127,7 @@ export function RegisterForm({
 
       <FormField
         name="confirmPassword"
-        label="Confirm password"
+        label={t("confirmPasswordLabel")}
         error={state.fieldErrors?.confirmPassword}
         required
       >
@@ -125,7 +141,7 @@ export function RegisterForm({
       <ErrorText message={state.formError} />
 
       <Button type="submit" isLoading={pending}>
-        Create account
+        {t("submit")}
       </Button>
     </form>
   );

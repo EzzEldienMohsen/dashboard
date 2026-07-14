@@ -1,9 +1,88 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: false; /* we supply schoollight/schooldark ourselves below */
+}
 
+@plugin "daisyui/theme" {
+  name: "schoollight";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #fafafa;
+  --color-base-300: #e4e4e7;
+  --color-base-content: #171717;
+
+  --color-primary: #4f46e5;
+  --color-primary-content: #eef2ff;
+  --color-secondary: #4f46e5;
+  --color-secondary-content: #eef2ff;
+  --color-accent: #4f46e5;
+  --color-accent-content: #eef2ff;
+
+  --color-neutral: #27272a;
+  --color-neutral-content: #fafafa;
+
+  --color-info: #4f46e5;
+  --color-info-content: #eef2ff;
+  --color-success: #22c55e;
+  --color-success-content: #f0fdf4;
+  --color-warning: #f59e0b;
+  --color-warning-content: #451a03;
+  --color-error: #ef4444;
+  --color-error-content: #fef2f2;
+
+  --radius-selector: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "schooldark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #18181b;
+  --color-base-200: #1f1f23;
+  --color-base-300: #27272a;
+  --color-base-content: #fafafa;
+
+  --color-primary: #818cf8;
+  --color-primary-content: #1e1b4b;
+  --color-secondary: #818cf8;
+  --color-secondary-content: #1e1b4b;
+  --color-accent: #818cf8;
+  --color-accent-content: #1e1b4b;
+
+  --color-neutral: #e4e4e7;
+  --color-neutral-content: #18181b;
+
+  --color-info: #818cf8;
+  --color-info-content: #1e1b4b;
+  --color-success: #22c55e;
+  --color-success-content: #052e12;
+  --color-warning: #f59e0b;
+  --color-warning-content: #451a03;
+  --color-error: #ef4444;
+  --color-error-content: #450a0a;
+
+  --radius-selector: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+:root {
   /* Fluid typography — clamp(min, preferred, max) scales continuously with
      viewport width instead of jumping at fixed breakpoints. */
   --font-size-display: clamp(2rem, 1.5rem + 2.2vw, 3.25rem);
@@ -19,32 +98,14 @@
   --leading-small: 1.45;
   --tracking-title: -0.01em;
 
-  /* Neutral ramp */
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f4f4f5;
-  --color-neutral-200: #e4e4e7;
-  --color-neutral-400: #a1a1aa;
-  --color-neutral-600: #52525b;
-  --color-neutral-800: #27272a;
-  --color-neutral-900: #18181b;
-
-  /* Brand (indigo) ramp */
-  --color-brand-50: #eef2ff;
-  --color-brand-400: #818cf8;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-
-  --color-danger-500: #ef4444;
-  --color-danger-600: #dc2626;
-  --color-success-500: #22c55e;
-
+  /* Deliberately outside the daisyUI theme blocks so it stays fixed across
+     themes: unlayered :root rules always beat daisyUI's @layer base theme
+     rules, so a per-theme --radius-field would be shadowed anyway. */
   --radius-field: 0.625rem;
   --space-field-gap: 1.25rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
@@ -60,49 +121,12 @@
   --text-small: var(--font-size-small);
   --text-small--line-height: var(--leading-small);
 
-  --color-neutral-50: var(--color-neutral-50);
-  --color-neutral-100: var(--color-neutral-100);
-  --color-neutral-200: var(--color-neutral-200);
-  --color-neutral-400: var(--color-neutral-400);
-  --color-neutral-600: var(--color-neutral-600);
-  --color-neutral-800: var(--color-neutral-800);
-  --color-neutral-900: var(--color-neutral-900);
-
-  --color-brand-50: var(--color-brand-50);
-  --color-brand-400: var(--color-brand-400);
-  --color-brand-600: var(--color-brand-600);
-  --color-brand-700: var(--color-brand-700);
-
-  --color-danger-500: var(--color-danger-500);
-  --color-danger-600: var(--color-danger-600);
-  --color-success-500: var(--color-success-500);
-
   --radius-field: var(--radius-field);
   --spacing-field-gap: var(--space-field-gap);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: var(--color-neutral-900);
-    --foreground: var(--color-neutral-50);
-
-    --color-neutral-50: #18181b;
-    --color-neutral-100: #1f1f23;
-    --color-neutral-200: #27272a;
-    --color-neutral-400: #71717a;
-    --color-neutral-600: #a1a1aa;
-    --color-neutral-800: #e4e4e7;
-    --color-neutral-900: #fafafa;
-
-    --color-brand-50: #1e1b4b;
-    --color-brand-400: #818cf8;
-    --color-brand-600: #818cf8;
-    --color-brand-700: #a5b4fc;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-base-100);
+  color: var(--color-base-content);
   font-family: Arial, Helvetica, sans-serif;
 }
