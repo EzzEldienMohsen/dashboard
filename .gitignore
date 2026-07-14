@@ -1,0 +1,21 @@
+node_modules
+
+# build outputs
+.next/
+dist/
+.turbo/
+build/
+
+# env
+.env
+.env.*.local
+
+# prisma generated client (Prisma 7 `prisma-client` generator output)
+apps/api/generated/
+
+# testing
+coverage/
+
+# misc
+*.log
+.DS_Store
