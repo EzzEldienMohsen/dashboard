@@ -124,12 +124,18 @@ async function seedUsers() {
         email: "manager@schooldashboard.dev",
         passwordHash,
         role: "MANAGER",
+        name: "Ava Manager",
+        phone: "+1-555-0100",
+        country: "United States",
       },
       {
         id: randomUUID(),
         email: "teacher@schooldashboard.dev",
         passwordHash,
         role: "TEACHER",
+        name: "Sam Teacher",
+        phone: "+1-555-0101",
+        country: "United States",
       },
     ],
   });
