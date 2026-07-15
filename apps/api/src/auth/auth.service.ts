@@ -30,8 +30,8 @@ export class AuthService {
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
     try {
-      const existing = await this.users.findByEmail(dto.email);
-      if (existing) {
+      const emailTaken = await this.users.existsByEmail(dto.email);
+      if (emailTaken) {
         throw new EmailAlreadyExistsException(dto.email);
       }
 

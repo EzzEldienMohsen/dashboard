@@ -11,12 +11,22 @@ export interface CreateUserData {
   country: string;
 }
 
+/** What JwtStrategy needs on every authenticated request — never includes passwordHash. */
+export type AuthUserEntity = Pick<User, 'id' | 'email' | 'role'>;
+
+/** What register()'s response DTO needs — never includes passwordHash. */
+export type CreatedUserEntity = Pick<
+  User,
+  'id' | 'email' | 'role' | 'name' | 'phone' | 'country' | 'createdAt'
+>;
+
 /**
  * Narrow persistence contract for users — only what the auth flow needs.
  * Any implementation must resolve `null` for a not-found lookup, never throw.
  */
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
-  findById(id: string): Promise<User | null>;
-  create(data: CreateUserData): Promise<User>;
+  existsByEmail(email: string): Promise<boolean>;
+  findById(id: string): Promise<AuthUserEntity | null>;
+  create(data: CreateUserData): Promise<CreatedUserEntity>;
 }

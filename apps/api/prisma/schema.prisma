@@ -69,6 +69,8 @@ model Class {
   schoolId String
   school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   students Student[]
+
+  @@index([schoolId])
 }
 
 model Student {
@@ -79,6 +81,8 @@ model Student {
   class      Class              @relation(fields: [classId], references: [id], onDelete: Cascade)
   attendance AttendanceRecord[]
   grades     GradeRecord[]
+
+  @@index([classId])
 }
 
 enum AttendanceStatus {

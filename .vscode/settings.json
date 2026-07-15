@@ -1,4 +1,11 @@
 {
     "prisma-smart-formatter.typescript.defaultFormatter": "esbenp.prettier-vscode",
-    "prisma-smart-formatter.typescriptreact.defaultFormatter": "esbenp.prettier-vscode"
+    "prisma-smart-formatter.typescriptreact.defaultFormatter": "esbenp.prettier-vscode",
+    "eslint.workingDirectories": [
+        { "directory": "apps/api", "changeProcessCWD": true },
+        { "directory": "apps/web", "changeProcessCWD": true }
+    ],
+    "typescript.tsdk": "apps/api/node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "js/ts.tsdk.path": "apps/api/node_modules/typescript/lib"
 }

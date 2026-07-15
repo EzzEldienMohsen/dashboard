@@ -11,6 +11,7 @@ import { BcryptPasswordHasher } from './services/bcrypt-password-hasher.service'
 import { JwtTokenService } from './services/jwt-token.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -33,9 +34,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
     AuthService,
     JwtStrategy,
     JwtAuthGuard,
+    RolesGuard,
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },
   ],
-  exports: [JwtAuthGuard],
+  exports: [JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

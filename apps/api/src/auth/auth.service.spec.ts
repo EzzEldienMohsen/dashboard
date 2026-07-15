@@ -22,6 +22,7 @@ describe('AuthService', () => {
 
   const users: jest.Mocked<IUserRepository> = {
     findByEmail: jest.fn(),
+    existsByEmail: jest.fn(),
     findById: jest.fn(),
     create: jest.fn(),
   };
@@ -71,7 +72,7 @@ describe('AuthService', () => {
     };
 
     it('creates a user and returns an access token', async () => {
-      users.findByEmail.mockResolvedValue(null);
+      users.existsByEmail.mockResolvedValue(false);
       hasher.hash.mockResolvedValue('hashed-password');
       users.create.mockResolvedValue(existingUser);
       tokens.sign.mockReturnValue('signed-jwt');
@@ -100,7 +101,7 @@ describe('AuthService', () => {
     });
 
     it('throws EmailAlreadyExistsException when the email is already taken', async () => {
-      users.findByEmail.mockResolvedValue(existingUser);
+      users.existsByEmail.mockResolvedValue(true);
 
       await expect(service.register(registerDto)).rejects.toBeInstanceOf(
         EmailAlreadyExistsException,
