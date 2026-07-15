@@ -11,6 +11,15 @@ const envSchema = z.object({
   BCRYPT_SALT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
   SENTRY_DSN: z.string().optional(),
   CORS_ORIGIN: z.string().optional(),
+  DB_POOL_SIZE: z.coerce.number().int().positive().default(10),
+  DB_POOL_IDLE_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  DB_POOL_CONNECTION_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5_000),
+  SLOW_QUERY_THRESHOLD_MS: z.coerce.number().int().positive().default(200),
+  REDIS_URL: z.string().optional(),
 });
 
 export type EnvironmentVariables = z.infer<typeof envSchema>;

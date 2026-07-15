@@ -1,10 +1,9 @@
-import { HttpStatus } from '@nestjs/common';
-import { AppException } from './app.exception';
+import { NotFoundAppException } from './not-found-app.exception';
 
-export class SchoolNotFoundException extends AppException {
+export class SchoolNotFoundException extends NotFoundAppException {
   readonly errorCode = 'SCHOOL_NOT_FOUND';
 
   constructor(id: string) {
-    super(`School with id ${id} was not found`, HttpStatus.NOT_FOUND);
+    super('School', id);
   }
 }

@@ -1,98 +1,63 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# School Dashboard API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS backend for the School Dashboard monorepo — a modular monolith (module-per-domain in one deployable process, not physically separate microservices) backed by Postgres via Prisma.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
+Each domain module (`schools`, `classes`, `students`, `school-profile`, `announcements`, `auth`, `users`) follows the same layered pattern:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ pnpm install
+```
+Controller → Service → Repository interface (DI token) → Prisma repository → Postgres
 ```
 
-## Compile and run the project
+- **DI / SOLID**: repositories are bound behind an interface via a `Symbol` token (e.g. `SCHOOL_REPOSITORY`), so services depend only on the interface — never the concrete Prisma implementation. `auth` additionally abstracts password hashing (`IPasswordHasher`) and token issuance (`ITokenService`) the same way.
+- **Errors**: every domain exception extends `AppException` (`src/common/exceptions/`); not-found exceptions share a `NotFoundAppException` base. A global `AllExceptionsFilter` normalizes all errors into a consistent JSON shape, logs via Pino, and reports 5xx errors to Sentry — masking the message in production.
+- **Caching**: `@nestjs/cache-manager`, applied per-route via `CacheInterceptor` + an explicit `Cache-Control` header. The store is in-memory by default; set `REDIS_URL` to back it with Redis instead (required once you run more than one replica — see `src/app.module.ts`).
+- **Public vs. protected routes**: `schools`/`classes`/`students` require `JwtAuthGuard` + `RolesGuard`; `school-profile`/`announcements`/`health` are intentionally public (no guards) since they're static/informational content, not per-user data.
+- **Pagination**: every list endpoint shares `PaginationQueryDto` (`page`, `limit`, capped at 100) and a shared `paginate()` helper (`src/common/utils/paginate.ts`) that wraps the `findMany` + `count` pattern.
+
+## Getting started
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm install
+cp ../../.env.example ../../.env         # docker compose reads this even for `up postgres` alone
+docker compose up -d postgres            # add `redis` too if you want to exercise the Redis cache path locally
+cp .env.example .env                     # fill in JWT_SECRET etc. — this one is read by the Node app itself
+pnpm exec prisma migrate deploy
+pnpm exec prisma db seed
+pnpm start:dev
 ```
 
-## Run tests
+(paths above are relative to `apps/api`; run from the repo root if you're using the `pnpm --filter api <script>` form instead)
+
+`GET /health` reports database connectivity (via `@nestjs/terminus`) and is meant for orchestrator liveness/readiness probes.
+
+## Running with Docker
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))") docker compose up -d --build
 ```
 
-## Deployment
+This builds `apps/api/Dockerfile` (multi-stage pnpm build) and starts `postgres`, `redis`, and `api` together — the api container automatically uses `REDIS_URL=redis://redis:6379`, so the cache is Redis-backed out of the box in this mode.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Tests
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+pnpm --filter api test        # unit tests (co-located *.spec.ts, mocked repositories/services)
+pnpm --filter api test:cov    # coverage — enforced via a coverageThreshold in package.json's jest config
+pnpm --filter api test:e2e    # supertest against a real Nest app + Postgres (test/*.e2e-spec.ts)
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Bootstrap files (`main.ts`, `instrument.ts`) and `*.module.ts` DI-wiring files are excluded from the coverage threshold — they contain no branching logic and are already exercised for real by the e2e suite (which boots the actual `AppModule`).
 
-## Resources
+## Performance notes
 
-Check out a few resources that may come in handy when working with NestJS:
+- The Postgres connection pool is sized via `DB_POOL_SIZE` / `DB_POOL_IDLE_TIMEOUT_MS` / `DB_POOL_CONNECTION_TIMEOUT_MS` (see `.env.example`) — size `DB_POOL_SIZE` to `postgres max_connections / replica count`, leaving headroom for other services.
+- Queries slower than `SLOW_QUERY_THRESHOLD_MS` (default 200ms) are logged as warnings outside production (`src/prisma/prisma.service.ts`).
+- A load-test baseline (autocannon, 20 connections × 8s, local Docker Postgres) against representative routes: `/announcements` ~2250 req/s avg (7-8ms avg latency, p99 ~49ms), `/school-profile` ~2500 req/s avg (p99 ~47ms), authenticated+cached `/schools` ~2500 req/s avg (p99 ~48ms) — zero errors across all three.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Code quality
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `pnpm --filter api lint` — ESLint (flat config, type-aware), `no-explicit-any`/`no-floating-promises`/`no-unsafe-argument` are hard errors.
+- `tsconfig.json` runs full `strict: true`.
+- A Husky pre-commit hook runs `lint-staged` (ESLint + Prettier) on staged files across both `apps/api` and `apps/web`.

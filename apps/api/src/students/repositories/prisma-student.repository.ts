@@ -6,6 +6,7 @@ import type {
   StudentEntity,
 } from '../interfaces/student-repository.interface';
 import type { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import { paginate } from '../../common/utils/paginate';
 
 const STUDENT_SELECT = {
   id: true,
@@ -25,23 +26,22 @@ export class PrismaStudentRepository implements IStudentRepository {
     });
   }
 
-  async findMany(
+  findMany(
     params: FindManyStudentsParams,
   ): Promise<PaginatedResult<StudentEntity>> {
-    const { page, limit, classId } = params;
-    const skip = (page - 1) * limit;
+    const { classId } = params;
     const where = classId ? { classId } : undefined;
 
-    const [items, total] = await Promise.all([
-      this.prisma.student.findMany({
-        where,
-        skip,
-        take: limit,
-        select: STUDENT_SELECT,
-      }),
-      this.prisma.student.count({ where }),
-    ]);
-
-    return { items, total, page, limit };
+    return paginate(
+      params,
+      ({ skip, take }) =>
+        this.prisma.student.findMany({
+          where,
+          skip,
+          take,
+          select: STUDENT_SELECT,
+        }),
+      () => this.prisma.student.count({ where }),
+    );
   }
 }

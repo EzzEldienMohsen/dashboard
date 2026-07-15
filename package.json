@@ -8,9 +8,20 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "prepare": "husky || true"
   },
   "devDependencies": {
+    "autocannon": "^8.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "turbo": "^2.10.5"
+  },
+  "lint-staged": {
+    "apps/api/**/*.ts": [
+      "eslint --fix --config apps/api/eslint.config.mjs",
+      "prettier --write --config apps/api/.prettierrc"
+    ],
+    "apps/web/**/*.{ts,tsx}": "eslint --fix --config apps/web/eslint.config.mjs"
   }
 }

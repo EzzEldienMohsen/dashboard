@@ -108,6 +108,13 @@ describe('AuthService', () => {
       );
       expect(users.create).not.toHaveBeenCalled();
     });
+
+    it('rethrows unexpected repository errors', async () => {
+      const dbError = new Error('connection lost');
+      users.existsByEmail.mockRejectedValue(dbError);
+
+      await expect(service.register(registerDto)).rejects.toBe(dbError);
+    });
   });
 
   describe('login', () => {
@@ -147,6 +154,13 @@ describe('AuthService', () => {
         InvalidCredentialsException,
       );
       expect(tokens.sign).not.toHaveBeenCalled();
+    });
+
+    it('rethrows unexpected repository errors', async () => {
+      const dbError = new Error('connection lost');
+      users.findByEmail.mockRejectedValue(dbError);
+
+      await expect(service.login(loginDto)).rejects.toBe(dbError);
     });
   });
 });
