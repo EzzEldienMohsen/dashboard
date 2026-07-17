@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/config/site";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
@@ -7,7 +8,8 @@ import { getLocaleDir } from "@/lib/locale/locales";
 import { LOCALE_COOKIE, resolveLocale } from "@/lib/locale/locale-cookie";
 import { resolveTheme, THEME_COOKIE } from "@/lib/theme/theme-cookie";
 import { ThemeProvider } from "@/lib/theme/theme-context";
-import { AppTopBar } from "@/components/organisms/AppTopBar";
+import { SiteHeader } from "@/components/organisms/SiteHeader";
+import { SiteFooter } from "@/components/organisms/SiteFooter";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,11 +23,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "School Dashboard",
     template: "%s | School Dashboard",
   },
   description: "School Dashboard — manage classes, students, and staff.",
+  openGraph: { type: "website", siteName: "School Dashboard" },
+  twitter: { card: "summary" },
 };
 
 export default async function RootLayout({
@@ -49,8 +54,9 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider initialTheme={theme}>
-            <AppTopBar />
-            {children}
+            <SiteHeader />
+            <main className="flex flex-col flex-1">{children}</main>
+            <SiteFooter />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

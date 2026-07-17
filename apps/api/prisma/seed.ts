@@ -1,24 +1,24 @@
-import "dotenv/config";
-import { randomUUID } from "node:crypto";
-import bcrypt from "bcrypt";
-import { faker } from "@faker-js/faker";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, $Enums } from "../generated/prisma/client.js";
+import 'dotenv/config';
+import { randomUUID } from 'node:crypto';
+import bcrypt from 'bcrypt';
+import { faker } from '@faker-js/faker';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient, $Enums } from '../generated/prisma/client.js';
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-const SUBJECTS = ["Math", "Science", "English", "Arabic", "History"];
+const SUBJECTS = ['Math', 'Science', 'English', 'Arabic', 'History'];
 const ASSESSMENTS_PER_SUBJECT = 3;
 const ATTENDANCE_DAYS = 60;
 const STUDENTS_PER_CLASS_RANGE: [number, number] = [20, 25];
 const ANNOUNCEMENT_COUNT = 20;
 
 const ATTENDANCE_WEIGHTS: Array<[$Enums.AttendanceStatus, number]> = [
-  ["PRESENT", 0.85],
-  ["ABSENT", 0.08],
-  ["LATE", 0.05],
-  ["EXCUSED", 0.02],
+  ['PRESENT', 0.85],
+  ['ABSENT', 0.08],
+  ['LATE', 0.05],
+  ['EXCUSED', 0.02],
 ];
 
 function weightedAttendanceStatus(): $Enums.AttendanceStatus {
@@ -28,7 +28,7 @@ function weightedAttendanceStatus(): $Enums.AttendanceStatus {
     cumulative += weight;
     if (roll <= cumulative) return status;
   }
-  return "PRESENT";
+  return 'PRESENT';
 }
 
 function pastWeekdays(count: number): Date[] {
@@ -56,13 +56,13 @@ async function clearExistingData() {
 async function seedSchoolProfile() {
   await prisma.schoolProfile.create({
     data: {
-      name: "Riverside International School",
+      name: 'Riverside International School',
       mission:
-        "To nurture curious, confident learners through a balanced, inclusive education that prepares every student for lifelong success.",
+        'To nurture curious, confident learners through a balanced, inclusive education that prepares every student for lifelong success.',
       foundedYear: 1998,
-      address: "42 Riverside Avenue, Springfield",
-      contactEmail: "info@riverside-school.example",
-      contactPhone: "+1-555-0142",
+      address: '42 Riverside Avenue, Springfield',
+      contactEmail: 'info@riverside-school.example',
+      contactPhone: '+1-555-0142',
     },
   });
 }
@@ -71,34 +71,34 @@ async function seedAnnouncements() {
   const categories = Object.values($Enums.AnnouncementCategory);
   const titlesByCategory: Record<string, string[]> = {
     GENERAL: [
-      "Library hours extended for exam season",
-      "New cafeteria menu now available",
+      'Library hours extended for exam season',
+      'New cafeteria menu now available',
       "School newsletter — this month's highlights",
-      "Uniform policy reminder for winter term",
+      'Uniform policy reminder for winter term',
     ],
     EVENT: [
-      "Annual Science Fair — save the date",
-      "Inter-school football tournament kicks off",
-      "Spring concert rehearsals begin next week",
-      "Career day guest speakers announced",
+      'Annual Science Fair — save the date',
+      'Inter-school football tournament kicks off',
+      'Spring concert rehearsals begin next week',
+      'Career day guest speakers announced',
     ],
     EXAM: [
-      "Mid-term exam schedule released",
-      "Final exam seating arrangements posted",
-      "Make-up exam registration now open",
-      "Exam hall guidelines for students",
+      'Mid-term exam schedule released',
+      'Final exam seating arrangements posted',
+      'Make-up exam registration now open',
+      'Exam hall guidelines for students',
     ],
     HOLIDAY: [
-      "School closed for national holiday",
-      "Winter break schedule confirmed",
-      "Half-day dismissal ahead of long weekend",
-      "Holiday homework packets available online",
+      'School closed for national holiday',
+      'Winter break schedule confirmed',
+      'Half-day dismissal ahead of long weekend',
+      'Holiday homework packets available online',
     ],
     URGENT: [
-      "Early dismissal today due to weather",
-      "Temporary road closure affects pickup/drop-off",
-      "Immediate action needed: contact info update",
-      "Health advisory from the school nurse",
+      'Early dismissal today due to weather',
+      'Temporary road closure affects pickup/drop-off',
+      'Immediate action needed: contact info update',
+      'Health advisory from the school nurse',
     ],
   };
 
@@ -112,30 +112,32 @@ async function seedAnnouncements() {
     })),
   );
 
-  await prisma.announcement.createMany({ data: rows.slice(0, ANNOUNCEMENT_COUNT) });
+  await prisma.announcement.createMany({
+    data: rows.slice(0, ANNOUNCEMENT_COUNT),
+  });
 }
 
 async function seedUsers() {
-  const passwordHash = await bcrypt.hash("Password123!", 10);
+  const passwordHash = await bcrypt.hash('Password123!', 10);
   await prisma.user.createMany({
     data: [
       {
         id: randomUUID(),
-        email: "manager@schooldashboard.dev",
+        email: 'manager@schooldashboard.dev',
         passwordHash,
-        role: "MANAGER",
-        name: "Ava Manager",
-        phone: "+1-555-0100",
-        country: "United States",
+        role: 'MANAGER',
+        name: 'Ava Manager',
+        phone: '+1-555-0100',
+        country: 'United States',
       },
       {
         id: randomUUID(),
-        email: "teacher@schooldashboard.dev",
+        email: 'teacher@schooldashboard.dev',
         passwordHash,
-        role: "TEACHER",
-        name: "Sam Teacher",
-        phone: "+1-555-0101",
-        country: "United States",
+        role: 'TEACHER',
+        name: 'Sam Teacher',
+        phone: '+1-555-0101',
+        country: 'United States',
       },
     ],
   });
@@ -146,13 +148,13 @@ async function seedSchoolHierarchy() {
   await prisma.school.create({
     data: {
       id: schoolId,
-      name: "Riverside International School",
-      address: "42 Riverside Avenue, Springfield",
+      name: 'Riverside International School',
+      address: '42 Riverside Avenue, Springfield',
     },
   });
 
   const gradeLevels = [4, 5, 6];
-  const sections = ["A", "B"];
+  const sections = ['A', 'B'];
 
   const classes = gradeLevels.flatMap((grade) =>
     sections.map((section) => ({
@@ -222,7 +224,11 @@ async function seedSchoolHierarchy() {
   await prisma.gradeRecord.createMany({ data: gradeRecords });
   await prisma.attendanceRecord.createMany({ data: attendanceRecords });
 
-  return { schoolId, classCount: classes.length, studentCount: students.length };
+  return {
+    schoolId,
+    classCount: classes.length,
+    studentCount: students.length,
+  };
 }
 
 async function main() {
@@ -232,8 +238,12 @@ async function main() {
   await seedUsers();
   const { classCount, studentCount } = await seedSchoolHierarchy();
 
-  console.log(`Seeded 1 school, ${classCount} classes, ${studentCount} students.`);
-  console.log("Demo logins: manager@schooldashboard.dev / teacher@schooldashboard.dev (password: Password123!)");
+  console.log(
+    `Seeded 1 school, ${classCount} classes, ${studentCount} students.`,
+  );
+  console.log(
+    'Demo logins: manager@schooldashboard.dev / teacher@schooldashboard.dev (password: Password123!)',
+  );
 }
 
 main()

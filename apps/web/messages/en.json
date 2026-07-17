@@ -8,6 +8,120 @@
       "label": "Language"
     }
   },
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "about": "About",
+    "announcements": "Announcements",
+    "getStarted": "Get Started"
+  },
+  "footer": {
+    "copyright": "© {year} Ezz Eldien Deghedy. All rights reserved.",
+    "links": {
+      "home": "Home",
+      "features": "Features",
+      "about": "About",
+      "announcements": "Announcements",
+      "login": "Log In",
+      "register": "Sign Up"
+    },
+    "contact": "Contact"
+  },
+  "home": {
+    "metaTitle": "{schoolName} — School Dashboard",
+    "metaDescription": "Manage your school's classes, students, and staff with a modern, all-in-one dashboard.",
+    "hero": {
+      "ctaStart": "Get Started",
+      "ctaLogin": "Log In"
+    },
+    "features": {
+      "heading": "Built for modern schools",
+      "viewAll": "See all features →"
+    },
+    "announcements": {
+      "heading": "Latest News",
+      "viewAll": "View all announcements →"
+    },
+    "cta": {
+      "heading": "Ready to transform your school?",
+      "button": "Create Free Account"
+    }
+  },
+  "features": {
+    "metaTitle": "Features — {schoolName}",
+    "metaDescription": "Explore the full feature set — student management, class scheduling, attendance tracking, and more.",
+    "hero": {
+      "heading": "Everything your school needs",
+      "sub": "A complete platform to manage students, classes, staff, and communication — all in one place."
+    },
+    "grid": {
+      "heading": "Full Feature Set",
+      "items": [
+        { "title": "Student Management", "desc": "Track student profiles, grades, and attendance with ease." },
+        { "title": "Class Scheduling", "desc": "Organise classes and timetables across your entire school." },
+        { "title": "Announcements", "desc": "Publish school-wide news and alerts instantly." },
+        { "title": "Multi-Role Access", "desc": "Separate dashboards for managers and teachers." },
+        { "title": "School Profile", "desc": "Showcase your school's mission, history, and contact details." },
+        { "title": "Attendance Tracking", "desc": "Record and review daily attendance for every student." }
+      ]
+    },
+    "howItWorks": {
+      "heading": "How It Works",
+      "steps": [
+        { "title": "Create your account", "desc": "Sign up as a manager or teacher in seconds." },
+        { "title": "Set up your school", "desc": "Add your school profile, classes, and students." },
+        { "title": "Invite your team", "desc": "Teachers get instant access to their classes and student lists." }
+      ]
+    },
+    "cta": {
+      "heading": "Start managing smarter.",
+      "button": "Create Free Account"
+    }
+  },
+  "about": {
+    "metaTitle": "About — {schoolName}",
+    "metaDescription": "Learn about {schoolName}'s mission, history, and how to get in touch.",
+    "hero": {
+      "heading": "About {schoolName}"
+    },
+    "profile": {
+      "founded": "Founded",
+      "address": "Address",
+      "email": "Contact Email",
+      "phone": "Contact Phone",
+      "mission": "Our Mission"
+    },
+    "cta": {
+      "heading": "Join {schoolName} today.",
+      "button": "Create Free Account"
+    }
+  },
+  "announcements": {
+    "metaTitle": "Announcements — {schoolName}",
+    "metaDescription": "Stay up to date with the latest news, events, and announcements from {schoolName}.",
+    "hero": {
+      "heading": "Announcements"
+    },
+    "categories": {
+      "ALL": "All",
+      "GENERAL": "General",
+      "EVENT": "Event",
+      "EXAM": "Exam",
+      "HOLIDAY": "Holiday",
+      "URGENT": "Urgent"
+    },
+    "empty": "No announcements yet.",
+    "readMore": "Read more →"
+  },
+  "announcementDetail": {
+    "backToList": "← Back to Announcements",
+    "publishedOn": "Published on {date}"
+  },
+  "stats": {
+    "schools": "Schools",
+    "students": "Students",
+    "teachers": "Teachers"
+  },
   "auth": {
     "login": {
       "metaTitle": "Log In",

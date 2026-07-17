@@ -1,0 +1,1 @@
+export { MarketingPageTemplate } from "./MarketingPageTemplate";

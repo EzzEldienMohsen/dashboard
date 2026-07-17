@@ -1,0 +1,1 @@
+export { AnnouncementsList } from "./AnnouncementsList";

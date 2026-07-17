@@ -1,0 +1,1 @@
+export { CTAStrip } from "./CTAStrip";
