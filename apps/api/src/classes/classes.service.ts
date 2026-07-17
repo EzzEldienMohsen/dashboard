@@ -7,6 +7,7 @@ import { ClassResponseDto } from './dto/class-response.dto';
 import { ClassNotFoundException } from '../common/exceptions/class-not-found.exception';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import type { ListClassesQueryDto } from './dto/list-classes-query.dto';
+import { withServiceError } from '../common/utils/service-error';
 
 @Injectable()
 export class ClassesService {
@@ -16,49 +17,52 @@ export class ClassesService {
     @Inject(CLASS_REPOSITORY) private readonly classes: IClassRepository,
   ) {}
 
-  async findById(id: string): Promise<ClassResponseDto> {
-    try {
-      const classEntity = await this.classes.findById(id);
-      if (!classEntity) {
-        throw new ClassNotFoundException(id);
-      }
-
-      return ClassResponseDto.fromEntity(classEntity);
-    } catch (err: unknown) {
-      if (err instanceof ClassNotFoundException) {
-        this.logger.warn({ msg: 'class not found', classId: id });
-        throw err;
-      }
-      this.logger.error({
-        msg: 'findById failed unexpectedly',
-        classId: id,
-        err,
-      });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+  findById(id: string, schoolId: string): Promise<ClassResponseDto> {
+    return withServiceError(
+      async () => {
+        const classEntity = await this.classes.findById(id, schoolId);
+        if (!classEntity) throw new ClassNotFoundException(id);
+        return ClassResponseDto.fromEntity(classEntity);
+      },
+      {
+        logger: this.logger,
+        notFound: {
+          ExceptionClass: ClassNotFoundException,
+          warnContext: { msg: 'class not found', classId: id, schoolId },
+        },
+        errorContext: {
+          msg: 'findById failed unexpectedly',
+          classId: id,
+          schoolId,
+        },
+      },
+    );
   }
 
-  async findMany(
+  findMany(
     query: ListClassesQueryDto,
+    schoolId: string,
   ): Promise<PaginatedResult<ClassResponseDto>> {
-    try {
-      const result = await this.classes.findMany({
-        page: query.page,
-        limit: query.limit,
-        schoolId: query.schoolId,
-      });
-
-      return {
-        items: result.items.map((classEntity) =>
-          ClassResponseDto.fromEntity(classEntity),
-        ),
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-      };
-    } catch (err: unknown) {
-      this.logger.error({ msg: 'findMany failed unexpectedly', query, err });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+    return withServiceError(
+      async () => {
+        const result = await this.classes.findMany({
+          page: query.page,
+          limit: query.limit,
+          schoolId,
+        });
+        return {
+          items: result.items.map((classEntity) =>
+            ClassResponseDto.fromEntity(classEntity),
+          ),
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+        };
+      },
+      {
+        logger: this.logger,
+        errorContext: { msg: 'findMany failed unexpectedly', query },
+      },
+    );
   }
 }

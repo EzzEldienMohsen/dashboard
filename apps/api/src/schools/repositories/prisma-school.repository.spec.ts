@@ -16,14 +16,14 @@ describe('PrismaSchoolRepository', () => {
   });
 
   describe('findById', () => {
-    it('queries by id with the narrowed select', async () => {
+    it('queries by id when it matches the caller school', async () => {
       school.findUnique.mockResolvedValue({
         id: 'school-1',
         name: 'Riverside High',
         address: '123 River Road',
       });
 
-      const result = await repository.findById('school-1');
+      const result = await repository.findById('school-1', 'school-1');
 
       expect(school.findUnique).toHaveBeenCalledWith({
         where: { id: 'school-1' },
@@ -36,34 +36,71 @@ describe('PrismaSchoolRepository', () => {
       });
     });
 
+    it('returns null without querying when the id is not the caller school', async () => {
+      const result = await repository.findById('school-2', 'school-1');
+
+      expect(school.findUnique).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+
     it('returns null when not found', async () => {
       school.findUnique.mockResolvedValue(null);
 
-      await expect(repository.findById('missing')).resolves.toBeNull();
+      await expect(
+        repository.findById('missing', 'missing'),
+      ).resolves.toBeNull();
     });
   });
 
   describe('findMany', () => {
-    it('computes skip from page/limit and passes the select', async () => {
+    it('scopes to the caller school and computes skip from page/limit', async () => {
       school.findMany.mockResolvedValue([
         { id: 'school-1', name: 'A', address: null },
       ]);
-      school.count.mockResolvedValue(21);
+      school.count.mockResolvedValue(1);
 
-      const result = await repository.findMany({ page: 3, limit: 10 });
+      const result = await repository.findMany({
+        page: 1,
+        limit: 10,
+        schoolId: 'school-1',
+      });
 
+      const where = { id: 'school-1' };
       expect(school.findMany).toHaveBeenCalledWith({
-        skip: 20,
+        where,
+        skip: 0,
         take: 10,
         select: SELECT,
       });
-      expect(school.count).toHaveBeenCalledWith();
+      expect(school.count).toHaveBeenCalledWith({ where });
       expect(result).toEqual({
         items: [{ id: 'school-1', name: 'A', address: null }],
-        total: 21,
-        page: 3,
+        total: 1,
+        page: 1,
         limit: 10,
       });
+    });
+  });
+
+  describe('existsById', () => {
+    it('returns true when a matching row is found', async () => {
+      school.findUnique.mockResolvedValue({ id: 'school-1' });
+
+      const result = await repository.existsById('school-1');
+
+      expect(school.findUnique).toHaveBeenCalledWith({
+        where: { id: 'school-1' },
+        select: { id: true },
+      });
+      expect(result).toBe(true);
+    });
+
+    it('returns false when no matching row is found', async () => {
+      school.findUnique.mockResolvedValue(null);
+
+      const result = await repository.existsById('missing');
+
+      expect(result).toBe(false);
     });
   });
 });

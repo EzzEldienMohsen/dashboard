@@ -117,7 +117,7 @@ async function seedAnnouncements() {
   });
 }
 
-async function seedUsers() {
+async function seedUsers(schoolId: string) {
   const passwordHash = await bcrypt.hash('Password123!', 10);
   await prisma.user.createMany({
     data: [
@@ -129,6 +129,7 @@ async function seedUsers() {
         name: 'Ava Manager',
         phone: '+1-555-0100',
         country: 'United States',
+        schoolId,
       },
       {
         id: randomUUID(),
@@ -138,6 +139,7 @@ async function seedUsers() {
         name: 'Sam Teacher',
         phone: '+1-555-0101',
         country: 'United States',
+        schoolId,
       },
     ],
   });
@@ -235,8 +237,8 @@ async function main() {
   await clearExistingData();
   await seedSchoolProfile();
   await seedAnnouncements();
-  await seedUsers();
-  const { classCount, studentCount } = await seedSchoolHierarchy();
+  const { schoolId, classCount, studentCount } = await seedSchoolHierarchy();
+  await seedUsers(schoolId);
 
   console.log(
     `Seeded 1 school, ${classCount} classes, ${studentCount} students.`,

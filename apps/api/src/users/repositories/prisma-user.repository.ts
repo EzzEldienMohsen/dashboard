@@ -8,7 +8,12 @@ import type {
   IUserRepository,
 } from '../interfaces/user-repository.interface';
 
-const AUTH_USER_SELECT = { id: true, email: true, role: true } as const;
+const AUTH_USER_SELECT = {
+  id: true,
+  email: true,
+  role: true,
+  schoolId: true,
+} as const;
 const CREATED_USER_SELECT = {
   id: true,
   email: true,

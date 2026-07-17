@@ -5,6 +5,7 @@ import {
 } from './interfaces/school-profile-repository.interface';
 import { SchoolProfileResponseDto } from './dto/school-profile-response.dto';
 import { SchoolProfileNotFoundException } from '../common/exceptions/school-profile-not-found.exception';
+import { withServiceError } from '../common/utils/service-error';
 
 @Injectable()
 export class SchoolProfileService {
@@ -15,21 +16,23 @@ export class SchoolProfileService {
     private readonly schoolProfile: ISchoolProfileRepository,
   ) {}
 
-  async find(): Promise<SchoolProfileResponseDto> {
-    try {
-      const profile = await this.schoolProfile.find();
-      if (!profile) {
-        throw new SchoolProfileNotFoundException();
-      }
-
-      return SchoolProfileResponseDto.fromEntity(profile);
-    } catch (err: unknown) {
-      if (err instanceof SchoolProfileNotFoundException) {
-        this.logger.warn({ msg: 'school profile not configured' });
-        throw err;
-      }
-      this.logger.error({ msg: 'find failed unexpectedly', err });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+  find(): Promise<SchoolProfileResponseDto> {
+    return withServiceError(
+      async () => {
+        const profile = await this.schoolProfile.find();
+        if (!profile) {
+          throw new SchoolProfileNotFoundException();
+        }
+        return SchoolProfileResponseDto.fromEntity(profile);
+      },
+      {
+        logger: this.logger,
+        notFound: {
+          ExceptionClass: SchoolProfileNotFoundException,
+          warnContext: { msg: 'school profile not configured' },
+        },
+        errorContext: { msg: 'find failed unexpectedly' },
+      },
+    );
   }
 }

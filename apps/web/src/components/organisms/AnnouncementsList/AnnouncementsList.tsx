@@ -51,7 +51,12 @@ export function AnnouncementsList({ announcements }: AnnouncementsListProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((a) => (
-            <AnnouncementCard key={a.id} {...a} />
+            <AnnouncementCard
+              key={a.id}
+              {...a}
+              categoryLabel={t(`categories.${a.category}` as Parameters<typeof t>[0])}
+              readMoreLabel={t("readMore")}
+            />
           ))}
         </div>
       )}

@@ -13,6 +13,7 @@ describe('SchoolsService', () => {
   const schools: jest.Mocked<ISchoolRepository> = {
     findById: jest.fn(),
     findMany: jest.fn(),
+    existsById: jest.fn(),
   };
 
   const existingSchool = {
@@ -37,9 +38,9 @@ describe('SchoolsService', () => {
     it('returns the mapped DTO when the school exists', async () => {
       schools.findById.mockResolvedValue(existingSchool);
 
-      const result = await service.findById('school-1');
+      const result = await service.findById('school-1', 'school-1');
 
-      expect(schools.findById).toHaveBeenCalledWith('school-1');
+      expect(schools.findById).toHaveBeenCalledWith('school-1', 'school-1');
       expect(result).toEqual({
         id: 'school-1',
         name: 'Riverside High',
@@ -50,21 +51,31 @@ describe('SchoolsService', () => {
     it('throws SchoolNotFoundException when the school does not exist', async () => {
       schools.findById.mockResolvedValue(null);
 
-      await expect(service.findById('missing')).rejects.toBeInstanceOf(
-        SchoolNotFoundException,
-      );
+      await expect(
+        service.findById('missing', 'missing'),
+      ).rejects.toBeInstanceOf(SchoolNotFoundException);
+    });
+
+    it('throws SchoolNotFoundException when the school belongs to another caller', async () => {
+      schools.findById.mockResolvedValue(null);
+
+      await expect(
+        service.findById('school-2', 'school-1'),
+      ).rejects.toBeInstanceOf(SchoolNotFoundException);
     });
 
     it('rethrows unexpected repository errors', async () => {
       const dbError = new Error('connection lost');
       schools.findById.mockRejectedValue(dbError);
 
-      await expect(service.findById('school-1')).rejects.toBe(dbError);
+      await expect(service.findById('school-1', 'school-1')).rejects.toBe(
+        dbError,
+      );
     });
   });
 
   describe('findMany', () => {
-    it('passes pagination through and maps items to DTOs', async () => {
+    it('passes pagination and caller schoolId through and maps items to DTOs', async () => {
       schools.findMany.mockResolvedValue({
         items: [existingSchool],
         total: 1,
@@ -73,9 +84,13 @@ describe('SchoolsService', () => {
       });
       const query: ListSchoolsQueryDto = { page: 2, limit: 10 };
 
-      const result = await service.findMany(query);
+      const result = await service.findMany(query, 'school-1');
 
-      expect(schools.findMany).toHaveBeenCalledWith({ page: 2, limit: 10 });
+      expect(schools.findMany).toHaveBeenCalledWith({
+        page: 2,
+        limit: 10,
+        schoolId: 'school-1',
+      });
       expect(result).toEqual({
         items: [
           { id: 'school-1', name: 'Riverside High', address: '123 River Road' },
@@ -90,9 +105,9 @@ describe('SchoolsService', () => {
       const dbError = new Error('connection lost');
       schools.findMany.mockRejectedValue(dbError);
 
-      await expect(service.findMany({ page: 1, limit: 20 })).rejects.toBe(
-        dbError,
-      );
+      await expect(
+        service.findMany({ page: 1, limit: 20 }, 'school-1'),
+      ).rejects.toBe(dbError);
     });
   });
 });

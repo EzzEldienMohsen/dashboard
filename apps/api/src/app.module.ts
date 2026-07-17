@@ -10,6 +10,10 @@ import { AppService } from './app.service';
 import { validateEnv } from './common/config/env.validation';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { READ_CACHE_TTL_MS } from './common/constants/cache.constant';
+import {
+  THROTTLE_TTL_MS,
+  THROTTLE_LIMIT,
+} from './common/constants/throttle.constant';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -20,6 +24,7 @@ import { SchoolProfileModule } from './school-profile/school-profile.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { PublicStatsModule } from './public-stats/public-stats.module';
 import { HealthModule } from './health/health.module';
+import { QueuesModule } from './queues/queues.module';
 
 /**
  * The default `cache-manager` store is an in-process Map — correct for a
@@ -46,7 +51,7 @@ function buildCacheStores(): KeyvRedis<unknown>[] | undefined {
             : undefined,
       },
     }),
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 20 }]),
+    ThrottlerModule.forRoot([{ ttl: THROTTLE_TTL_MS, limit: THROTTLE_LIMIT }]),
     CacheModule.register({
       isGlobal: true,
       ttl: READ_CACHE_TTL_MS,
@@ -62,6 +67,7 @@ function buildCacheStores(): KeyvRedis<unknown>[] | undefined {
     AnnouncementsModule,
     PublicStatsModule,
     HealthModule,
+    QueuesModule,
   ],
   controllers: [AppController],
   providers: [

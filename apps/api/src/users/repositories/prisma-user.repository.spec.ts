@@ -18,6 +18,7 @@ describe('PrismaUserRepository', () => {
     name: 'Jane Doe',
     phone: '+1-555-0110',
     country: 'United States',
+    schoolId: 'school-1',
     createdAt: new Date('2026-01-01T00:00:00.000Z'),
   };
 
@@ -61,23 +62,25 @@ describe('PrismaUserRepository', () => {
   });
 
   describe('findById', () => {
-    it('selects only id/email/role — never passwordHash', async () => {
+    it('selects only id/email/role/schoolId — never passwordHash', async () => {
       user.findUnique.mockResolvedValue({
         id: 'user-1',
         email: 'jane@example.com',
         role: 'TEACHER',
+        schoolId: 'school-1',
       });
 
       const result = await repository.findById('user-1');
 
       expect(user.findUnique).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        select: { id: true, email: true, role: true },
+        select: { id: true, email: true, role: true, schoolId: true },
       });
       expect(result).toEqual({
         id: 'user-1',
         email: 'jane@example.com',
         role: 'TEACHER',
+        schoolId: 'school-1',
       });
     });
   });
@@ -91,6 +94,7 @@ describe('PrismaUserRepository', () => {
         name: 'Jane Doe',
         phone: '+1-555-0110',
         country: 'United States',
+        schoolId: 'school-1',
       };
       const created = {
         id: 'user-1',

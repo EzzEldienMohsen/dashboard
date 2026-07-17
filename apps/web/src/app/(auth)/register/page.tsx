@@ -6,8 +6,7 @@ import { RegisterForm } from "@/components/organisms/RegisterForm";
 import { registerAction } from "../actions";
 import { initialAuthActionState } from "../action-state";
 import { getCountryOptions } from "@/lib/countries";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+import { SITE_URL } from "@/lib/config/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("auth.register");
@@ -15,6 +14,12 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("metaTitle"),
     description: t("metaDescription"),
     robots: { index: true, follow: true },
+    openGraph: {
+      title: t("metaTitle"),
+      description: t("metaDescription"),
+      type: "website",
+      url: `${SITE_URL}/register`,
+    },
   };
 }
 

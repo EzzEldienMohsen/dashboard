@@ -9,6 +9,8 @@ export type SchoolEntity = Pick<School, 'id' | 'name' | 'address'>;
 export interface FindManySchoolsParams {
   page: number;
   limit: number;
+  /** Caller-derived tenant scope — never client-suppliable. */
+  schoolId: string;
 }
 
 /**
@@ -16,8 +18,11 @@ export interface FindManySchoolsParams {
  * Any implementation must resolve `null` for a not-found lookup, never throw.
  */
 export interface ISchoolRepository {
-  findById(id: string): Promise<SchoolEntity | null>;
+  /** `callerSchoolId` is the authenticated caller's own school — never a client-suppliable filter. */
+  findById(id: string, callerSchoolId: string): Promise<SchoolEntity | null>;
   findMany(
     params: FindManySchoolsParams,
   ): Promise<PaginatedResult<SchoolEntity>>;
+  /** Unscoped by design — used only to validate a schoolId at registration time. */
+  existsById(id: string): Promise<boolean>;
 }

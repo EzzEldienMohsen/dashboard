@@ -7,12 +7,21 @@ import {
   type IUserRepository,
 } from './../src/users/interfaces/user-repository.interface';
 import type { AuthResponseDto } from './../src/auth/dto/auth-response.dto';
+import { PrismaService } from './../src/prisma/prisma.service';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication<App>;
+  let schoolId: string;
 
   beforeAll(async () => {
     app = await createTestApp();
+
+    // Fetched directly via Prisma (not GET /schools) so this setup step
+    // doesn't warm the JwtStrategy's Redis user cache ahead of the
+    // dedicated "authenticated request caching" test below.
+    const prisma = app.get(PrismaService);
+    const school = await prisma.school.findFirstOrThrow();
+    schoolId = school.id;
   });
 
   afterAll(async () => {
@@ -27,6 +36,7 @@ describe('AuthController (e2e)', () => {
         .post('/auth/register')
         .send({
           role: 'TEACHER',
+          schoolId,
           name: 'E2E Test User',
           email,
           phone: '+1-555-0199',
@@ -49,6 +59,7 @@ describe('AuthController (e2e)', () => {
         .post('/auth/register')
         .send({
           role: 'TEACHER',
+          schoolId,
           name: 'Duplicate User',
           email: 'manager@schooldashboard.dev',
           phone: '+1-555-0199',
@@ -68,6 +79,7 @@ describe('AuthController (e2e)', () => {
         .post('/auth/register')
         .send({
           role: 'TEACHER',
+          schoolId,
           name: 'Mismatch User',
           email: `e2e-mismatch-${Date.now()}@example.com`,
           phone: '+1-555-0199',
@@ -76,6 +88,26 @@ describe('AuthController (e2e)', () => {
           confirmPassword: 'SomethingElse1!',
         })
         .expect(400);
+    });
+
+    it('rejects an unknown schoolId with 404', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({
+          role: 'TEACHER',
+          schoolId: 'does-not-exist',
+          name: 'No School User',
+          email: `e2e-no-school-${Date.now()}@example.com`,
+          phone: '+1-555-0199',
+          country: 'United States',
+          password: 'Passw0rd!',
+          confirmPassword: 'Passw0rd!',
+        })
+        .expect(404);
+
+      expect((res.body as ErrorResponseBody).errorCode).toBe(
+        'SCHOOL_NOT_FOUND',
+      );
     });
   });
 

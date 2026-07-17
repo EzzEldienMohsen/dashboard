@@ -4,6 +4,7 @@ import type { PrismaService } from '../../prisma/prisma.service';
 describe('PrismaClassRepository', () => {
   const classDelegate = {
     findUnique: jest.fn(),
+    findFirst: jest.fn(),
     findMany: jest.fn(),
     count: jest.fn(),
   };
@@ -16,17 +17,17 @@ describe('PrismaClassRepository', () => {
   });
 
   describe('findById', () => {
-    it('queries by id with the narrowed select', async () => {
-      classDelegate.findUnique.mockResolvedValue({
+    it('queries by id scoped to the caller school', async () => {
+      classDelegate.findFirst.mockResolvedValue({
         id: 'class-1',
         name: 'Grade 5-A',
         schoolId: 'school-1',
       });
 
-      const result = await repository.findById('class-1');
+      const result = await repository.findById('class-1', 'school-1');
 
-      expect(classDelegate.findUnique).toHaveBeenCalledWith({
-        where: { id: 'class-1' },
+      expect(classDelegate.findFirst).toHaveBeenCalledWith({
+        where: { id: 'class-1', schoolId: 'school-1' },
         select: SELECT,
       });
       expect(result).toEqual({
@@ -35,25 +36,18 @@ describe('PrismaClassRepository', () => {
         schoolId: 'school-1',
       });
     });
+
+    it('returns null when the class belongs to another school', async () => {
+      classDelegate.findFirst.mockResolvedValue(null);
+
+      await expect(
+        repository.findById('class-1', 'school-2'),
+      ).resolves.toBeNull();
+    });
   });
 
   describe('findMany', () => {
-    it('omits the where clause when no schoolId filter is given', async () => {
-      classDelegate.findMany.mockResolvedValue([]);
-      classDelegate.count.mockResolvedValue(0);
-
-      await repository.findMany({ page: 1, limit: 20 });
-
-      expect(classDelegate.findMany).toHaveBeenCalledWith({
-        where: undefined,
-        skip: 0,
-        take: 20,
-        select: SELECT,
-      });
-      expect(classDelegate.count).toHaveBeenCalledWith({ where: undefined });
-    });
-
-    it('applies the schoolId filter and pagination when given', async () => {
+    it('scopes to the caller school and computes skip from page/limit', async () => {
       classDelegate.findMany.mockResolvedValue([
         { id: 'class-1', name: 'Grade 5-A', schoolId: 'school-1' },
       ]);
@@ -65,15 +59,14 @@ describe('PrismaClassRepository', () => {
         schoolId: 'school-1',
       });
 
+      const where = { schoolId: 'school-1' };
       expect(classDelegate.findMany).toHaveBeenCalledWith({
-        where: { schoolId: 'school-1' },
+        where,
         skip: 3,
         take: 3,
         select: SELECT,
       });
-      expect(classDelegate.count).toHaveBeenCalledWith({
-        where: { schoolId: 'school-1' },
-      });
+      expect(classDelegate.count).toHaveBeenCalledWith({ where });
       expect(result).toEqual({
         items: [{ id: 'class-1', name: 'Grade 5-A', schoolId: 'school-1' }],
         total: 6,

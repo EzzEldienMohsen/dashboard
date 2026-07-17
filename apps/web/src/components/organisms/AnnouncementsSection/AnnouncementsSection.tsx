@@ -1,21 +1,18 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AnnouncementCard } from "@/components/molecules/AnnouncementCard";
-
-interface Announcement {
-  id: string;
-  title: string;
-  body: string;
-  category: string;
-  publishedAt: string;
-}
+import { getAnnouncements } from "@/lib/api";
 
 interface AnnouncementsSectionProps {
-  announcements: Announcement[];
+  limit: number;
 }
 
-export async function AnnouncementsSection({ announcements }: AnnouncementsSectionProps) {
-  const t = await getTranslations("home.announcements");
+export async function AnnouncementsSection({ limit }: AnnouncementsSectionProps) {
+  const [t, tAnnouncements, { items: announcements }] = await Promise.all([
+    getTranslations("home.announcements"),
+    getTranslations("announcements"),
+    getAnnouncements(limit),
+  ]);
 
   return (
     <section className="py-16">
@@ -28,7 +25,14 @@ export async function AnnouncementsSection({ announcements }: AnnouncementsSecti
       {announcements.length === 0 ? null : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {announcements.map((a) => (
-            <AnnouncementCard key={a.id} {...a} />
+            <AnnouncementCard
+              key={a.id}
+              {...a}
+              categoryLabel={tAnnouncements(
+                `categories.${a.category}` as Parameters<typeof tAnnouncements>[0],
+              )}
+              readMoreLabel={tAnnouncements("readMore")}
+            />
           ))}
         </div>
       )}

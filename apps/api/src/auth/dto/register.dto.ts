@@ -19,6 +19,10 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
+  schoolId!: string;
+
+  @IsString()
+  @IsNotEmpty()
   @MaxLength(100)
   name!: string;
 

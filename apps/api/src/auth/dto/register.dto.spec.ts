@@ -4,6 +4,7 @@ import { RegisterDto } from './register.dto';
 
 const validPayload = {
   role: 'MANAGER',
+  schoolId: 'school-1',
   name: 'Ava Manager',
   email: 'ava@example.com',
   phone: '+1-555-0100',
@@ -21,6 +22,14 @@ describe('RegisterDto', () => {
     const errors = await validate(toDto(validPayload));
 
     expect(errors).toHaveLength(0);
+  });
+
+  it('rejects a missing schoolId', async () => {
+    const errors = await validate(
+      toDto({ ...validPayload, schoolId: undefined }),
+    );
+
+    expect(errors.some((e) => e.property === 'schoolId')).toBe(true);
   });
 
   it('rejects an invalid role', async () => {

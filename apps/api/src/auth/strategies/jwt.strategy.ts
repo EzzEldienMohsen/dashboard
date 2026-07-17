@@ -14,6 +14,7 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   role: string;
+  schoolId: string;
 }
 
 function userCacheKey(userId: string): string {
@@ -50,6 +51,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       id: user.id,
       email: user.email,
       role: user.role,
+      schoolId: user.schoolId,
     };
     await this.cache.set(cacheKey, authenticatedUser, READ_CACHE_TTL_MS);
     return authenticatedUser;

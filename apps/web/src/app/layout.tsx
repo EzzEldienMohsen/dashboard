@@ -10,6 +10,7 @@ import { resolveTheme, THEME_COOKIE } from "@/lib/theme/theme-cookie";
 import { ThemeProvider } from "@/lib/theme/theme-context";
 import { SiteHeader } from "@/components/organisms/SiteHeader";
 import { SiteFooter } from "@/components/organisms/SiteFooter";
+import { getSchoolProfile } from "@/lib/api";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   },
   description: "School Dashboard — manage classes, students, and staff.",
   openGraph: { type: "website", siteName: "School Dashboard" },
-  twitter: { card: "summary" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default async function RootLayout({
@@ -43,6 +44,7 @@ export default async function RootLayout({
   const locale = resolveLocale(cookieStore.get(LOCALE_COOKIE)?.value);
   const dir = getLocaleDir(locale);
   const messages = await getMessages();
+  const { name: schoolName } = await getSchoolProfile();
 
   return (
     <html
@@ -54,7 +56,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider initialTheme={theme}>
-            <SiteHeader />
+            <SiteHeader schoolName={schoolName} />
             <main className="flex flex-col flex-1">{children}</main>
             <SiteFooter />
           </ThemeProvider>

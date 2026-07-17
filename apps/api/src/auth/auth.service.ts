@@ -4,8 +4,15 @@ import {
   type IUserRepository,
 } from '../users/interfaces/user-repository.interface';
 import { UserResponseDto } from '../users/dto/user-response.dto';
+import {
+  SCHOOL_REPOSITORY,
+  type ISchoolRepository,
+} from '../schools/interfaces/school-repository.interface';
 import { EmailAlreadyExistsException } from '../common/exceptions/email-already-exists.exception';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
+import { SchoolNotFoundException } from '../common/exceptions/school-not-found.exception';
+import { withServiceError } from '../common/utils/service-error';
+import { EventQueueService } from '../queues/event-queue.service';
 import {
   PASSWORD_HASHER,
   type IPasswordHasher,
@@ -24,97 +31,128 @@ export class AuthService {
 
   constructor(
     @Inject(USER_REPOSITORY) private readonly users: IUserRepository,
+    @Inject(SCHOOL_REPOSITORY) private readonly schools: ISchoolRepository,
     @Inject(PASSWORD_HASHER) private readonly hasher: IPasswordHasher,
     @Inject(TOKEN_SERVICE) private readonly tokens: ITokenService,
+    private readonly eventQueue: EventQueueService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthResponseDto> {
-    try {
-      const emailTaken = await this.users.existsByEmail(dto.email);
-      if (emailTaken) {
-        throw new EmailAlreadyExistsException(dto.email);
-      }
-
-      const passwordHash = await this.hasher.hash(dto.password);
-      const user = await this.users.create({
-        email: dto.email,
-        passwordHash,
-        role: dto.role,
-        name: dto.name,
-        phone: dto.phone,
-        country: dto.country,
-      });
-
-      const accessToken = this.tokens.sign({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      });
-      this.logger.log({
-        msg: 'user registered',
-        userId: user.id,
-        email: user.email,
-      });
-
-      return { accessToken, user: UserResponseDto.fromEntity(user) };
-    } catch (err: unknown) {
-      if (err instanceof EmailAlreadyExistsException) {
+  private queueAuditEvent(action: string, userId: string): void {
+    void this.eventQueue
+      .queueAuditEvent({
+        userId,
+        action,
+        resourceType: 'User',
+        resourceId: userId,
+        timestamp: new Date().toISOString(),
+      })
+      .catch((err: unknown) => {
         this.logger.warn({
-          msg: 'register rejected: email already exists',
-          email: dto.email,
+          msg: 'failed to queue audit event',
+          action,
+          userId,
+          err,
         });
-        throw err;
-      }
-      this.logger.error({
-        msg: 'register failed unexpectedly',
-        email: dto.email,
-        err,
       });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+  }
+
+  async register(dto: RegisterDto): Promise<AuthResponseDto> {
+    return withServiceError(
+      async () => {
+        const emailTaken = await this.users.existsByEmail(dto.email);
+        if (emailTaken) {
+          throw new EmailAlreadyExistsException(dto.email);
+        }
+
+        const schoolExists = await this.schools.existsById(dto.schoolId);
+        if (!schoolExists) {
+          throw new SchoolNotFoundException(dto.schoolId);
+        }
+
+        const passwordHash = await this.hasher.hash(dto.password);
+        const user = await this.users.create({
+          email: dto.email,
+          passwordHash,
+          role: dto.role,
+          name: dto.name,
+          phone: dto.phone,
+          country: dto.country,
+          schoolId: dto.schoolId,
+        });
+
+        const accessToken = this.tokens.sign({
+          sub: user.id,
+          email: user.email,
+          role: user.role,
+          schoolId: dto.schoolId,
+        });
+        this.logger.log({
+          msg: 'user registered',
+          userId: user.id,
+          email: user.email,
+        });
+
+        this.queueAuditEvent('user.register', user.id);
+
+        return { accessToken, user: UserResponseDto.fromEntity(user) };
+      },
+      {
+        logger: this.logger,
+        notFound: {
+          ExceptionClass: EmailAlreadyExistsException,
+          warnContext: {
+            msg: 'register rejected: email already exists',
+            email: dto.email,
+          },
+        },
+        errorContext: { msg: 'register failed unexpectedly', email: dto.email },
+      },
+    );
   }
 
   async login(dto: LoginDto): Promise<AuthResponseDto> {
-    try {
-      const user = await this.users.findByEmail(dto.email);
-      if (!user) {
-        throw new InvalidCredentialsException();
-      }
+    return withServiceError(
+      async () => {
+        const user = await this.users.findByEmail(dto.email);
+        if (!user) {
+          throw new InvalidCredentialsException();
+        }
 
-      const isValid = await this.hasher.compare(
-        dto.password,
-        user.passwordHash,
-      );
-      if (!isValid) {
-        throw new InvalidCredentialsException();
-      }
+        const isValid = await this.hasher.compare(
+          dto.password,
+          user.passwordHash,
+        );
+        if (!isValid) {
+          throw new InvalidCredentialsException();
+        }
 
-      const accessToken = this.tokens.sign({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      });
-      this.logger.log({
-        msg: 'user logged in',
-        userId: user.id,
-        email: user.email,
-      });
-
-      return { accessToken, user: UserResponseDto.fromEntity(user) };
-    } catch (err: unknown) {
-      if (err instanceof InvalidCredentialsException) {
-        this.logger.warn({
-          msg: 'login rejected: invalid credentials',
-          email: dto.email,
+        const accessToken = this.tokens.sign({
+          sub: user.id,
+          email: user.email,
+          role: user.role,
+          schoolId: user.schoolId,
         });
-        throw err;
-      }
-      this.logger.error({
-        msg: 'login failed unexpectedly',
-        email: dto.email,
-        err,
-      });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+        this.logger.log({
+          msg: 'user logged in',
+          userId: user.id,
+          email: user.email,
+        });
+
+        this.queueAuditEvent('user.login', user.id);
+
+        return { accessToken, user: UserResponseDto.fromEntity(user) };
+      },
+      {
+        logger: this.logger,
+        notFound: {
+          ExceptionClass: InvalidCredentialsException,
+          warnContext: {
+            msg: 'login rejected: invalid credentials',
+            email: dto.email,
+          },
+        },
+        errorContext: { msg: 'login failed unexpectedly', email: dto.email },
+      },
+    );
   }
 }

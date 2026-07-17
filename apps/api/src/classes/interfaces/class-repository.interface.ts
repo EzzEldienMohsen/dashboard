@@ -9,7 +9,8 @@ export type ClassEntity = Pick<Class, 'id' | 'name' | 'schoolId'>;
 export interface FindManyClassesParams {
   page: number;
   limit: number;
-  schoolId?: string;
+  /** Caller-derived tenant scope — never client-suppliable. */
+  schoolId: string;
 }
 
 /**
@@ -17,7 +18,8 @@ export interface FindManyClassesParams {
  * Any implementation must resolve `null` for a not-found lookup, never throw.
  */
 export interface IClassRepository {
-  findById(id: string): Promise<ClassEntity | null>;
+  /** `schoolId` is the authenticated caller's own school — never a client-suppliable filter. */
+  findById(id: string, schoolId: string): Promise<ClassEntity | null>;
   findMany(
     params: FindManyClassesParams,
   ): Promise<PaginatedResult<ClassEntity>>;

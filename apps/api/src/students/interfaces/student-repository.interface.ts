@@ -12,6 +12,8 @@ export type StudentEntity = Pick<
 export interface FindManyStudentsParams {
   page: number;
   limit: number;
+  /** Caller-derived tenant scope — never client-suppliable. */
+  schoolId: string;
   classId?: string;
 }
 
@@ -20,7 +22,8 @@ export interface FindManyStudentsParams {
  * Any implementation must resolve `null` for a not-found lookup, never throw.
  */
 export interface IStudentRepository {
-  findById(id: string): Promise<StudentEntity | null>;
+  /** `schoolId` is the authenticated caller's own school — never a client-suppliable filter. */
+  findById(id: string, schoolId: string): Promise<StudentEntity | null>;
   findMany(
     params: FindManyStudentsParams,
   ): Promise<PaginatedResult<StudentEntity>>;

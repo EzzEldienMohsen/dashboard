@@ -8,7 +8,8 @@ import { StatsSection } from "@/components/organisms/StatsSection";
 import { FeatureCardGrid } from "@/components/organisms/FeatureCardGrid";
 import { AnnouncementsSection } from "@/components/organisms/AnnouncementsSection";
 import { CTAStrip } from "@/components/organisms/CTAStrip";
-import { getSchoolProfile, getPublicStats, getAnnouncements } from "@/lib/api";
+import { FadeInSection } from "@/components/atoms/FadeInSection";
+import { getSchoolProfile } from "@/lib/api";
 
 export const revalidate = 3600;
 
@@ -29,12 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const t = await getTranslations("home");
-
-  const [profile, stats, newsData] = await Promise.all([
+  const [t, profile] = await Promise.all([
+    getTranslations("home"),
     getSchoolProfile(),
-    getPublicStats(),
-    getAnnouncements(3),
   ]);
 
   const jsonLd = [
@@ -63,21 +61,23 @@ export default async function HomePage() {
         hero={<HeroSection schoolName={profile.name} mission={profile.mission} />}
       >
         <Suspense fallback={<SectionSkeleton />}>
-          <StatsSection {...stats} />
+          <FadeInSection delay={0}><StatsSection /></FadeInSection>
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <FeatureCardGrid variant="compact" />
+          <FadeInSection delay={0.1}><FeatureCardGrid variant="compact" /></FadeInSection>
         </Suspense>
-        <div className="flex justify-end mb-4">
-          <Link href="/features" className="link link-primary text-sm font-medium">
-            {t("features.viewAll")}
-          </Link>
-        </div>
+        <FadeInSection delay={0.2}>
+          <div className="flex justify-end mb-4">
+            <Link href="/features" className="link link-primary text-sm font-medium">
+              {t("features.viewAll")}
+            </Link>
+          </div>
+        </FadeInSection>
         <Suspense fallback={<SectionSkeleton />}>
-          <AnnouncementsSection announcements={newsData.items} />
+          <FadeInSection delay={0.2}><AnnouncementsSection limit={3} /></FadeInSection>
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <CTAStrip heading={t("cta.heading")} buttonLabel={t("cta.button")} />
+          <FadeInSection delay={0.3}><CTAStrip heading={t("cta.heading")} buttonLabel={t("cta.button")} /></FadeInSection>
         </Suspense>
       </MarketingPageTemplate>
     </>

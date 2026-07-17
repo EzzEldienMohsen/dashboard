@@ -58,13 +58,24 @@ export default async function AnnouncementDetailPage({
     day: "numeric",
   });
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    headline: announcement.title,
-    datePublished: announcement.publishedAt,
-    url: `/announcements/${announcement.id}`,
-  };
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      headline: announcement.title,
+      datePublished: announcement.publishedAt,
+      url: `/announcements/${announcement.id}`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+        { "@type": "ListItem", position: 2, name: tAnn("hero.heading"), item: "/announcements" },
+        { "@type": "ListItem", position: 3, name: announcement.title },
+      ],
+    },
+  ];
 
   return (
     <>

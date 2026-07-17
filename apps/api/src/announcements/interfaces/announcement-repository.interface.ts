@@ -1,5 +1,6 @@
 import type { Announcement, $Enums } from '../../../generated/prisma/client.js';
 import type { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import type { CursorPaginatedResult } from '../../common/interfaces/cursor-paginated-result.interface';
 
 export const ANNOUNCEMENT_REPOSITORY = Symbol('ANNOUNCEMENT_REPOSITORY');
 
@@ -24,4 +25,9 @@ export interface IAnnouncementRepository {
   findMany(
     params: FindManyAnnouncementsParams,
   ): Promise<PaginatedResult<AnnouncementEntity>>;
+  findManyCursor(params: {
+    cursor?: string;
+    limit: number;
+    category?: $Enums.AnnouncementCategory;
+  }): Promise<CursorPaginatedResult<AnnouncementEntity>>;
 }

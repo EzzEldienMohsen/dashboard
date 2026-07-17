@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
@@ -9,14 +10,18 @@ import {
 import type { SchoolResponseDto } from './../src/schools/dto/school-response.dto';
 import type { AuthResponseDto } from './../src/auth/dto/auth-response.dto';
 import type { PaginatedResult } from './../src/common/interfaces/paginated-result.interface';
+import { PrismaService } from './../src/prisma/prisma.service';
 
 describe('SchoolsController (e2e)', () => {
   let app: INestApplication<App>;
   let managerToken: string;
   let teacherToken: string;
+  let prisma: PrismaService;
+  let otherSchoolId: string;
 
   beforeAll(async () => {
     app = await createTestApp();
+    prisma = app.get(PrismaService);
 
     const managerLogin = await request(app.getHttpServer())
       .post('/auth/login')
@@ -27,9 +32,15 @@ describe('SchoolsController (e2e)', () => {
       .post('/auth/login')
       .send({ email: 'teacher@schooldashboard.dev', password: 'Password123!' });
     teacherToken = (teacherLogin.body as AuthResponseDto).accessToken;
+
+    otherSchoolId = randomUUID();
+    await prisma.school.create({
+      data: { id: otherSchoolId, name: 'Other School (e2e fixture)' },
+    });
   });
 
   afterAll(async () => {
+    await prisma.school.delete({ where: { id: otherSchoolId } });
     await app.close();
   });
 
@@ -79,6 +90,25 @@ describe('SchoolsController (e2e)', () => {
       .expect(404);
 
     expect((res.body as ErrorResponseBody).errorCode).toBe('SCHOOL_NOT_FOUND');
+  });
+
+  it('returns 404 for a different school, never leaking cross-tenant data', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/schools/${otherSchoolId}`)
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(404);
+
+    expect((res.body as ErrorResponseBody).errorCode).toBe('SCHOOL_NOT_FOUND');
+  });
+
+  it('never includes another school in the list results', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/schools')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(200);
+    const body = res.body as PaginatedResult<SchoolResponseDto>;
+
+    expect(body.items.some((item) => item.id === otherSchoolId)).toBe(false);
   });
 
   it('rejects an out-of-range page', async () => {

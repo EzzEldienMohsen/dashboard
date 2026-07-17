@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
@@ -10,15 +11,20 @@ import type { ClassResponseDto } from './../src/classes/dto/class-response.dto';
 import type { SchoolResponseDto } from './../src/schools/dto/school-response.dto';
 import type { AuthResponseDto } from './../src/auth/dto/auth-response.dto';
 import type { PaginatedResult } from './../src/common/interfaces/paginated-result.interface';
+import { PrismaService } from './../src/prisma/prisma.service';
 
 describe('ClassesController (e2e)', () => {
   let app: INestApplication<App>;
   let managerToken: string;
   let teacherToken: string;
   let schoolId: string;
+  let prisma: PrismaService;
+  let otherSchoolId: string;
+  let otherClassId: string;
 
   beforeAll(async () => {
     app = await createTestApp();
+    prisma = app.get(PrismaService);
 
     const managerLogin = await request(app.getHttpServer())
       .post('/auth/login')
@@ -34,9 +40,23 @@ describe('ClassesController (e2e)', () => {
       .get('/schools')
       .set('Authorization', `Bearer ${managerToken}`);
     schoolId = (schools.body as PaginatedResult<SchoolResponseDto>).items[0].id;
+
+    otherSchoolId = randomUUID();
+    await prisma.school.create({
+      data: { id: otherSchoolId, name: 'Other School (e2e fixture)' },
+    });
+    otherClassId = randomUUID();
+    await prisma.class.create({
+      data: {
+        id: otherClassId,
+        name: 'Other School Class',
+        schoolId: otherSchoolId,
+      },
+    });
   });
 
   afterAll(async () => {
+    await prisma.school.delete({ where: { id: otherSchoolId } });
     await app.close();
   });
 
@@ -62,9 +82,9 @@ describe('ClassesController (e2e)', () => {
     await request(app.getHttpServer()).get('/classes').expect(401);
   });
 
-  it('filters by schoolId', async () => {
+  it('only ever returns classes belonging to the caller school', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/classes?schoolId=${schoolId}`)
+      .get('/classes?limit=100')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
     const body = res.body as PaginatedResult<ClassResponseDto>;
@@ -73,6 +93,23 @@ describe('ClassesController (e2e)', () => {
     for (const item of body.items) {
       expect(item.schoolId).toBe(schoolId);
     }
+    expect(body.items.some((item) => item.id === otherClassId)).toBe(false);
+  });
+
+  it('rejects a client-supplied schoolId query param', async () => {
+    await request(app.getHttpServer())
+      .get(`/classes?schoolId=${otherSchoolId}`)
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(400);
+  });
+
+  it('returns 404 for a class belonging to another school', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/classes/${otherClassId}`)
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(404);
+
+    expect((res.body as ErrorResponseBody).errorCode).toBe('CLASS_NOT_FOUND');
   });
 
   it('fetches a class by id', async () => {

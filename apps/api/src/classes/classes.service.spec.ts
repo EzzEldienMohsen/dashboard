@@ -37,9 +37,9 @@ describe('ClassesService', () => {
     it('returns the mapped DTO when the class exists', async () => {
       classes.findById.mockResolvedValue(existingClass);
 
-      const result = await service.findById('class-1');
+      const result = await service.findById('class-1', 'school-1');
 
-      expect(classes.findById).toHaveBeenCalledWith('class-1');
+      expect(classes.findById).toHaveBeenCalledWith('class-1', 'school-1');
       expect(result).toEqual({
         id: 'class-1',
         name: 'Grade 5-A',
@@ -50,34 +50,40 @@ describe('ClassesService', () => {
     it('throws ClassNotFoundException when the class does not exist', async () => {
       classes.findById.mockResolvedValue(null);
 
-      await expect(service.findById('missing')).rejects.toBeInstanceOf(
-        ClassNotFoundException,
-      );
+      await expect(
+        service.findById('missing', 'school-1'),
+      ).rejects.toBeInstanceOf(ClassNotFoundException);
+    });
+
+    it('throws ClassNotFoundException when the class belongs to another school', async () => {
+      classes.findById.mockResolvedValue(null);
+
+      await expect(
+        service.findById('class-1', 'school-2'),
+      ).rejects.toBeInstanceOf(ClassNotFoundException);
     });
 
     it('rethrows unexpected repository errors', async () => {
       const dbError = new Error('connection lost');
       classes.findById.mockRejectedValue(dbError);
 
-      await expect(service.findById('class-1')).rejects.toBe(dbError);
+      await expect(service.findById('class-1', 'school-1')).rejects.toBe(
+        dbError,
+      );
     });
   });
 
   describe('findMany', () => {
-    it('passes pagination and schoolId filter through and maps items to DTOs', async () => {
+    it('passes pagination and the caller schoolId through and maps items to DTOs', async () => {
       classes.findMany.mockResolvedValue({
         items: [existingClass],
         total: 1,
         page: 1,
         limit: 20,
       });
-      const query: ListClassesQueryDto = {
-        page: 1,
-        limit: 20,
-        schoolId: 'school-1',
-      };
+      const query: ListClassesQueryDto = { page: 1, limit: 20 };
 
-      const result = await service.findMany(query);
+      const result = await service.findMany(query, 'school-1');
 
       expect(classes.findMany).toHaveBeenCalledWith({
         page: 1,
@@ -96,9 +102,9 @@ describe('ClassesService', () => {
       const dbError = new Error('connection lost');
       classes.findMany.mockRejectedValue(dbError);
 
-      await expect(service.findMany({ page: 1, limit: 20 })).rejects.toBe(
-        dbError,
-      );
+      await expect(
+        service.findMany({ page: 1, limit: 20 }, 'school-1'),
+      ).rejects.toBe(dbError);
     });
   });
 });

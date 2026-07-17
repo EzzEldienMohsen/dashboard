@@ -3,6 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule, type JwtSignOptions } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
+import { SCHOOL_REPOSITORY } from '../schools/interfaces/school-repository.interface';
+import { PrismaSchoolRepository } from '../schools/repositories/prisma-school.repository';
+import { QueuesModule } from '../queues/queues.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PASSWORD_HASHER } from './interfaces/password-hasher.interface';
@@ -16,6 +19,7 @@ import { RolesGuard } from './guards/roles.guard';
 @Module({
   imports: [
     UsersModule,
+    QueuesModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -37,6 +41,7 @@ import { RolesGuard } from './guards/roles.guard';
     RolesGuard,
     { provide: PASSWORD_HASHER, useClass: BcryptPasswordHasher },
     { provide: TOKEN_SERVICE, useClass: JwtTokenService },
+    { provide: SCHOOL_REPOSITORY, useClass: PrismaSchoolRepository },
   ],
   exports: [JwtAuthGuard, RolesGuard],
 })

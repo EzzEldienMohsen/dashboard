@@ -1,5 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
+import {
+  DEFAULT_PAGE_LIMIT,
+  MAX_PAGE_LIMIT,
+} from '../constants/pagination.constant';
 
 export class PaginationQueryDto {
   @IsOptional()
@@ -12,6 +16,6 @@ export class PaginationQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
-  limit: number = 20;
+  @Max(MAX_PAGE_LIMIT)
+  limit: number = DEFAULT_PAGE_LIMIT;
 }

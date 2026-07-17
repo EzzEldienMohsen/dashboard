@@ -7,6 +7,7 @@ import { SchoolResponseDto } from './dto/school-response.dto';
 import { SchoolNotFoundException } from '../common/exceptions/school-not-found.exception';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import type { ListSchoolsQueryDto } from './dto/list-schools-query.dto';
+import { withServiceError } from '../common/utils/service-error';
 
 @Injectable()
 export class SchoolsService {
@@ -16,48 +17,48 @@ export class SchoolsService {
     @Inject(SCHOOL_REPOSITORY) private readonly schools: ISchoolRepository,
   ) {}
 
-  async findById(id: string): Promise<SchoolResponseDto> {
-    try {
-      const school = await this.schools.findById(id);
-      if (!school) {
-        throw new SchoolNotFoundException(id);
-      }
-
-      return SchoolResponseDto.fromEntity(school);
-    } catch (err: unknown) {
-      if (err instanceof SchoolNotFoundException) {
-        this.logger.warn({ msg: 'school not found', schoolId: id });
-        throw err;
-      }
-      this.logger.error({
-        msg: 'findById failed unexpectedly',
-        schoolId: id,
-        err,
-      });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+  findById(id: string, schoolId: string): Promise<SchoolResponseDto> {
+    return withServiceError(
+      async () => {
+        const school = await this.schools.findById(id, schoolId);
+        if (!school) throw new SchoolNotFoundException(id);
+        return SchoolResponseDto.fromEntity(school);
+      },
+      {
+        logger: this.logger,
+        notFound: {
+          ExceptionClass: SchoolNotFoundException,
+          warnContext: { msg: 'school not found', schoolId: id },
+        },
+        errorContext: { msg: 'findById failed unexpectedly', schoolId: id },
+      },
+    );
   }
 
-  async findMany(
+  findMany(
     query: ListSchoolsQueryDto,
+    schoolId: string,
   ): Promise<PaginatedResult<SchoolResponseDto>> {
-    try {
-      const result = await this.schools.findMany({
-        page: query.page,
-        limit: query.limit,
-      });
-
-      return {
-        items: result.items.map((school) =>
-          SchoolResponseDto.fromEntity(school),
-        ),
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-      };
-    } catch (err: unknown) {
-      this.logger.error({ msg: 'findMany failed unexpectedly', query, err });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+    return withServiceError(
+      async () => {
+        const result = await this.schools.findMany({
+          page: query.page,
+          limit: query.limit,
+          schoolId,
+        });
+        return {
+          items: result.items.map((school) =>
+            SchoolResponseDto.fromEntity(school),
+          ),
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+        };
+      },
+      {
+        logger: this.logger,
+        errorContext: { msg: 'findMany failed unexpectedly', query },
+      },
+    );
   }
 }

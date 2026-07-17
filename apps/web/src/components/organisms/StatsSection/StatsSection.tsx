@@ -1,18 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { StatCard } from "@/components/molecules/StatCard";
+import { getPublicStats } from "@/lib/api";
 
-interface StatsSectionProps {
-  schoolsCount: number;
-  studentsCount: number;
-  teachersCount: number;
-}
-
-export async function StatsSection({
-  schoolsCount,
-  studentsCount,
-  teachersCount,
-}: StatsSectionProps) {
-  const t = await getTranslations("stats");
+export async function StatsSection() {
+  const [t, { schoolsCount, studentsCount, teachersCount }] = await Promise.all([
+    getTranslations("stats"),
+    getPublicStats(),
+  ]);
 
   return (
     <section className="py-16">

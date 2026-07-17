@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
@@ -10,15 +11,20 @@ import type { StudentResponseDto } from './../src/students/dto/student-response.
 import type { ClassResponseDto } from './../src/classes/dto/class-response.dto';
 import type { AuthResponseDto } from './../src/auth/dto/auth-response.dto';
 import type { PaginatedResult } from './../src/common/interfaces/paginated-result.interface';
+import { PrismaService } from './../src/prisma/prisma.service';
 
 describe('StudentsController (e2e)', () => {
   let app: INestApplication<App>;
   let managerToken: string;
   let teacherToken: string;
   let classId: string;
+  let prisma: PrismaService;
+  let otherSchoolId: string;
+  let otherStudentId: string;
 
   beforeAll(async () => {
     app = await createTestApp();
+    prisma = app.get(PrismaService);
 
     const managerLogin = await request(app.getHttpServer())
       .post('/auth/login')
@@ -34,9 +40,32 @@ describe('StudentsController (e2e)', () => {
       .get('/classes')
       .set('Authorization', `Bearer ${managerToken}`);
     classId = (classes.body as PaginatedResult<ClassResponseDto>).items[0].id;
+
+    otherSchoolId = randomUUID();
+    await prisma.school.create({
+      data: { id: otherSchoolId, name: 'Other School (e2e fixture)' },
+    });
+    const otherClassId = randomUUID();
+    await prisma.class.create({
+      data: {
+        id: otherClassId,
+        name: 'Other School Class',
+        schoolId: otherSchoolId,
+      },
+    });
+    otherStudentId = randomUUID();
+    await prisma.student.create({
+      data: {
+        id: otherStudentId,
+        firstName: 'Other',
+        lastName: 'Student',
+        classId: otherClassId,
+      },
+    });
   });
 
   afterAll(async () => {
+    await prisma.school.delete({ where: { id: otherSchoolId } });
     await app.close();
   });
 
@@ -97,6 +126,25 @@ describe('StudentsController (e2e)', () => {
       .expect(404);
 
     expect((res.body as ErrorResponseBody).errorCode).toBe('STUDENT_NOT_FOUND');
+  });
+
+  it('returns 404 for a student belonging to another school', async () => {
+    const res = await request(app.getHttpServer())
+      .get(`/students/${otherStudentId}`)
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(404);
+
+    expect((res.body as ErrorResponseBody).errorCode).toBe('STUDENT_NOT_FOUND');
+  });
+
+  it('never includes another school in the list results', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/students?limit=100')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(200);
+    const body = res.body as PaginatedResult<StudentResponseDto>;
+
+    expect(body.items.some((item) => item.id === otherStudentId)).toBe(false);
   });
 
   it('rejects a limit above the max', async () => {

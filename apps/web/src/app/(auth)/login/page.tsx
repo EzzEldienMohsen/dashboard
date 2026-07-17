@@ -5,8 +5,7 @@ import { AuthPageTemplate } from "@/components/templates/AuthPageTemplate";
 import { LoginForm } from "@/components/organisms/LoginForm";
 import { loginAction } from "../actions";
 import { initialAuthActionState } from "../action-state";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+import { SITE_URL } from "@/lib/config/site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("auth.login");
@@ -14,6 +13,12 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t("metaTitle"),
     description: t("metaDescription"),
     robots: { index: true, follow: true },
+    openGraph: {
+      title: t("metaTitle"),
+      description: t("metaDescription"),
+      type: "website",
+      url: `${SITE_URL}/login`,
+    },
   };
 }
 

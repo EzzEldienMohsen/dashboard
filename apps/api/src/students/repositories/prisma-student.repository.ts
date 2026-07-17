@@ -19,9 +19,9 @@ const STUDENT_SELECT = {
 export class PrismaStudentRepository implements IStudentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findById(id: string): Promise<StudentEntity | null> {
-    return this.prisma.student.findUnique({
-      where: { id },
+  findById(id: string, schoolId: string): Promise<StudentEntity | null> {
+    return this.prisma.student.findFirst({
+      where: { id, class: { schoolId } },
       select: STUDENT_SELECT,
     });
   }
@@ -29,8 +29,10 @@ export class PrismaStudentRepository implements IStudentRepository {
   findMany(
     params: FindManyStudentsParams,
   ): Promise<PaginatedResult<StudentEntity>> {
-    const { classId } = params;
-    const where = classId ? { classId } : undefined;
+    const { schoolId, classId } = params;
+    const where = classId
+      ? { classId, class: { schoolId } }
+      : { class: { schoolId } };
 
     return paginate(
       params,

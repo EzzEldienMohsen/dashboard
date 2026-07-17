@@ -1,19 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Role } from '../../generated/prisma/client.js';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  PUBLIC_STATS_REPOSITORY,
+  type IPublicStatsRepository,
+} from './interfaces/public-stats-repository.interface';
 import { PublicStatsResponseDto } from './dto/public-stats-response.dto';
 
 @Injectable()
 export class PublicStatsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PUBLIC_STATS_REPOSITORY)
+    private readonly publicStats: IPublicStatsRepository,
+  ) {}
 
-  async getStats(): Promise<PublicStatsResponseDto> {
-    const [schoolsCount, studentsCount, teachersCount] = await Promise.all([
-      this.prisma.school.count(),
-      this.prisma.student.count(),
-      this.prisma.user.count({ where: { role: Role.TEACHER } }),
-    ]);
-
-    return { schoolsCount, studentsCount, teachersCount };
+  getStats(): Promise<PublicStatsResponseDto> {
+    return this.publicStats.getCounts();
   }
 }

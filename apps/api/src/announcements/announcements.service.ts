@@ -7,6 +7,9 @@ import { AnnouncementResponseDto } from './dto/announcement-response.dto';
 import { AnnouncementNotFoundException } from '../common/exceptions/announcement-not-found.exception';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import type { ListAnnouncementsQueryDto } from './dto/list-announcements-query.dto';
+import type { CursorPaginatedResult } from '../common/interfaces/cursor-paginated-result.interface';
+import type { CursorPaginationQueryDto } from '../common/dto/cursor-pagination-query.dto';
+import { withServiceError } from '../common/utils/service-error';
 
 @Injectable()
 export class AnnouncementsService {
@@ -17,49 +20,74 @@ export class AnnouncementsService {
     private readonly announcements: IAnnouncementRepository,
   ) {}
 
-  async findById(id: string): Promise<AnnouncementResponseDto> {
-    try {
-      const announcement = await this.announcements.findById(id);
-      if (!announcement) {
-        throw new AnnouncementNotFoundException(id);
-      }
-
-      return AnnouncementResponseDto.fromEntity(announcement);
-    } catch (err: unknown) {
-      if (err instanceof AnnouncementNotFoundException) {
-        this.logger.warn({ msg: 'announcement not found', announcementId: id });
-        throw err;
-      }
-      this.logger.error({
-        msg: 'findById failed unexpectedly',
-        announcementId: id,
-        err,
-      });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+  findById(id: string): Promise<AnnouncementResponseDto> {
+    return withServiceError(
+      async () => {
+        const announcement = await this.announcements.findById(id);
+        if (!announcement) throw new AnnouncementNotFoundException(id);
+        return AnnouncementResponseDto.fromEntity(announcement);
+      },
+      {
+        logger: this.logger,
+        notFound: {
+          ExceptionClass: AnnouncementNotFoundException,
+          warnContext: { msg: 'announcement not found', announcementId: id },
+        },
+        errorContext: {
+          msg: 'findById failed unexpectedly',
+          announcementId: id,
+        },
+      },
+    );
   }
 
-  async findMany(
+  findMany(
     query: ListAnnouncementsQueryDto,
   ): Promise<PaginatedResult<AnnouncementResponseDto>> {
-    try {
-      const result = await this.announcements.findMany({
-        page: query.page,
-        limit: query.limit,
-        category: query.category,
-      });
+    return withServiceError(
+      async () => {
+        const result = await this.announcements.findMany({
+          page: query.page,
+          limit: query.limit,
+          category: query.category,
+        });
+        return {
+          items: result.items.map((announcement) =>
+            AnnouncementResponseDto.fromEntity(announcement),
+          ),
+          total: result.total,
+          page: result.page,
+          limit: result.limit,
+        };
+      },
+      {
+        logger: this.logger,
+        errorContext: { msg: 'findMany failed unexpectedly', query },
+      },
+    );
+  }
 
-      return {
-        items: result.items.map((announcement) =>
-          AnnouncementResponseDto.fromEntity(announcement),
-        ),
-        total: result.total,
-        page: result.page,
-        limit: result.limit,
-      };
-    } catch (err: unknown) {
-      this.logger.error({ msg: 'findMany failed unexpectedly', query, err });
-      throw err; // rethrown for AllExceptionsFilter to normalize, log with breadcrumbs, and report to Sentry
-    }
+  findManyCursor(
+    query: CursorPaginationQueryDto,
+  ): Promise<CursorPaginatedResult<AnnouncementResponseDto>> {
+    return withServiceError(
+      async () => {
+        const result = await this.announcements.findManyCursor({
+          cursor: query.cursor,
+          limit: query.limit,
+        });
+        return {
+          items: result.items.map((announcement) =>
+            AnnouncementResponseDto.fromEntity(announcement),
+          ),
+          nextCursor: result.nextCursor,
+          hasMore: result.hasMore,
+        };
+      },
+      {
+        logger: this.logger,
+        errorContext: { msg: 'findManyCursor failed unexpectedly', query },
+      },
+    );
   }
 }

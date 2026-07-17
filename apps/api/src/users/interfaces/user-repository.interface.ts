@@ -9,10 +9,11 @@ export interface CreateUserData {
   name: string;
   phone: string;
   country: string;
+  schoolId: string;
 }
 
 /** What JwtStrategy needs on every authenticated request — never includes passwordHash. */
-export type AuthUserEntity = Pick<User, 'id' | 'email' | 'role'>;
+export type AuthUserEntity = Pick<User, 'id' | 'email' | 'role' | 'schoolId'>;
 
 /** What register()'s response DTO needs — never includes passwordHash. */
 export type CreatedUserEntity = Pick<

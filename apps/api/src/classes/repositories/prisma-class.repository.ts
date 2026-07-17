@@ -14,9 +14,9 @@ const CLASS_SELECT = { id: true, name: true, schoolId: true } as const;
 export class PrismaClassRepository implements IClassRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findById(id: string): Promise<ClassEntity | null> {
-    return this.prisma.class.findUnique({
-      where: { id },
+  findById(id: string, schoolId: string): Promise<ClassEntity | null> {
+    return this.prisma.class.findFirst({
+      where: { id, schoolId },
       select: CLASS_SELECT,
     });
   }
@@ -24,8 +24,7 @@ export class PrismaClassRepository implements IClassRepository {
   findMany(
     params: FindManyClassesParams,
   ): Promise<PaginatedResult<ClassEntity>> {
-    const { schoolId } = params;
-    const where = schoolId ? { schoolId } : undefined;
+    const where = { schoolId: params.schoolId };
 
     return paginate(
       params,

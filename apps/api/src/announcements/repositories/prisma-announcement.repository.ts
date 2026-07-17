@@ -6,7 +6,10 @@ import type {
   IAnnouncementRepository,
 } from '../interfaces/announcement-repository.interface';
 import type { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import type { CursorPaginatedResult } from '../../common/interfaces/cursor-paginated-result.interface';
 import { paginate } from '../../common/utils/paginate';
+import { paginateCursor } from '../../common/utils/paginate-cursor';
+import type { $Enums } from '../../../generated/prisma/client.js';
 
 const ANNOUNCEMENT_SELECT = {
   id: true,
@@ -44,6 +47,24 @@ export class PrismaAnnouncementRepository implements IAnnouncementRepository {
           orderBy: { publishedAt: 'desc' },
         }),
       () => this.prisma.announcement.count({ where }),
+    );
+  }
+
+  findManyCursor(params: {
+    cursor?: string;
+    limit: number;
+    category?: $Enums.AnnouncementCategory;
+  }): Promise<CursorPaginatedResult<AnnouncementEntity>> {
+    const { cursor, limit, category } = params;
+    const where = category ? { category } : {};
+
+    return paginateCursor({ cursor, limit }, (args) =>
+      this.prisma.announcement.findMany({
+        ...args,
+        where,
+        select: ANNOUNCEMENT_SELECT,
+        orderBy: { publishedAt: 'desc' },
+      }),
     );
   }
 }
