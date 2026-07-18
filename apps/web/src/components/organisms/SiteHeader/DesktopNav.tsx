@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { NavLink } from "@/components/molecules/NavLink";
 import { NAV_LINKS } from "@/lib/config/nav-links";
@@ -12,7 +12,7 @@ export function DesktopNav() {
     <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
       {NAV_LINKS.map((link) => (
         <NavLink key={link.href} href={link.href}>
-          {t(link.labelKey as Parameters<typeof t>[0])}
+          {t(link.labelKey)}
         </NavLink>
       ))}
       <Link href="/register" className="btn btn-primary btn-sm ms-2">

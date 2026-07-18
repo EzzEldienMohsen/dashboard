@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { NavLink } from "@/components/molecules/NavLink";
@@ -36,7 +36,7 @@ export function MobileNav() {
             <nav className="flex flex-col gap-2 px-[5%] py-4" aria-label="Mobile navigation">
               {NAV_LINKS.map((link) => (
                 <NavLink key={link.href} href={link.href} onClick={() => setOpen(false)}>
-                  {t(link.labelKey as Parameters<typeof t>[0])}
+                  {t(link.labelKey)}
                 </NavLink>
               ))}
               <div className="border-t border-base-300 mt-2 pt-3">

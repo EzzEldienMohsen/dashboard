@@ -1,4 +1,4 @@
-import type { AuthActionState } from "@/app/(auth)/action-state";
+import type { AuthActionState } from "@/app/[locale]/(auth)/action-state";
 import type { AuthApiFailure } from "./auth-api-client";
 
 type Translator = (key: string) => string;

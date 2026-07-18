@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import { getSchoolProfile } from "@/lib/api";
 import { FOOTER_LINKS } from "@/lib/config/nav-links";
@@ -31,7 +31,7 @@ export async function SiteFooter() {
                   href={link.href}
                   className="text-sm text-base-content/60 hover:text-base-content transition-colors"
                 >
-                  {t(link.labelKey as Parameters<typeof t>[0])}
+                  {t(link.labelKey)}
                 </Link>
               </li>
             ))}

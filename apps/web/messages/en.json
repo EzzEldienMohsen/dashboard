@@ -197,5 +197,52 @@
       "invalidCredentials": "Invalid email or password",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "dashboard": {
+    "nav": {
+      "sidebarLabel": "Dashboard navigation",
+      "overview": "Overview",
+      "classes": "Classes",
+      "students": "Students",
+      "logout": "Log out"
+    },
+    "overview": {
+      "title": "Overview",
+      "attendanceBreakdownTitle": "Attendance breakdown",
+      "gradesBySubjectTitle": "Grades by subject",
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "excused": "Excused"
+    },
+    "common": {
+      "previous": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {totalPages}",
+      "allClasses": "All classes",
+      "filterByClass": "Filter by class"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "message": "We couldn't load this page. Please try again.",
+      "retry": "Try again"
+    },
+    "loading": "Loading…"
+  },
+  "schools": {
+    "address": "Address",
+    "noAddress": "No address on file"
+  },
+  "classes": {
+    "title": "Classes",
+    "columnName": "Name",
+    "empty": "No classes found."
+  },
+  "students": {
+    "title": "Students",
+    "columnFirstName": "First name",
+    "columnLastName": "Last name",
+    "columnClass": "Class",
+    "empty": "No students found."
   }
 }

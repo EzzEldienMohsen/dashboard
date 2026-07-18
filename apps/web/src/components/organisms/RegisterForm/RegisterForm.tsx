@@ -10,7 +10,7 @@ import { PasswordInput } from "@/components/atoms/PasswordInput";
 import { Button } from "@/components/atoms/Button";
 import { ErrorText } from "@/components/atoms/ErrorText";
 import { fieldInputBaseClassName } from "@/components/atoms/field-input";
-import type { AuthActionState } from "@/app/(auth)/action-state";
+import type { AuthActionState } from "@/app/[locale]/(auth)/action-state";
 import type { CountryOption } from "@/lib/countries";
 
 /**

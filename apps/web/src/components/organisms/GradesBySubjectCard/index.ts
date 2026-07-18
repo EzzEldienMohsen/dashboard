@@ -1,0 +1,1 @@
+export { GradesBySubjectCard } from "./GradesBySubjectCard";

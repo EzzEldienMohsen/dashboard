@@ -7,7 +7,7 @@ import { TextInput } from "@/components/atoms/TextInput";
 import { PasswordInput } from "@/components/atoms/PasswordInput";
 import { Button } from "@/components/atoms/Button";
 import { ErrorText } from "@/components/atoms/ErrorText";
-import type { AuthActionState } from "@/app/(auth)/action-state";
+import type { AuthActionState } from "@/app/[locale]/(auth)/action-state";
 
 export interface LoginFormProps {
   action: (

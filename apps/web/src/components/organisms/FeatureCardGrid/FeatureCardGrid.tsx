@@ -17,8 +17,8 @@ export async function FeatureCardGrid({ variant }: FeatureCardGridProps) {
   const { count, gridClass } = GRID_VARIANTS[variant];
 
   const items = Array.from({ length: count }, (_, i) => ({
-    title: t(`items.${i}.title` as Parameters<typeof t>[0]),
-    desc: t(`items.${i}.desc` as Parameters<typeof t>[0]),
+    title: t(`items.${i}.title`),
+    desc: t(`items.${i}.desc`),
     icon: ICONS[i],
   }));
 

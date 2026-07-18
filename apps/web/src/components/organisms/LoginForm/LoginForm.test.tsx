@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { LoginForm } from "./LoginForm";
-import type { AuthActionState } from "@/app/(auth)/action-state";
+import type { AuthActionState } from "@/app/[locale]/(auth)/action-state";
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,

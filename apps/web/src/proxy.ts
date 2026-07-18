@@ -1,51 +1,67 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/locale/locales";
-import {
-  LOCALE_COOKIE,
-  LOCALE_COOKIE_MAX_AGE_SECONDS,
-} from "@/lib/locale/locale-cookie";
+import createMiddleware from "next-intl/middleware";
+import { decodeJwt } from "jose";
+import { routing } from "@/i18n/routing";
+import { SESSION_COOKIE } from "@/lib/auth/session-cookie";
 
-const SUPPORTED_CODES = LOCALES.map((locale) => locale.code) as string[];
+const intlMiddleware = createMiddleware(routing);
 
 /**
- * Only acts on a visitor's very first request (no locale cookie yet) —
- * negotiates Accept-Language so the server can render the right language
- * from byte one. Once the cookie exists, next-intl's request config reads
- * it directly and this proxy is a no-op pass-through.
+ * Decode-only UX check (not a security boundary — see session.ts). A
+ * standalone decode rather than importing the cache()-wrapped DAL: proxy
+ * runs in a distinct execution context where React's per-request cache()
+ * semantics don't apply. Every real data fetch is still gated server-side
+ * by the NestJS JwtAuthGuard/RolesGuard regardless of what runs here —
+ * per Next's own guidance, Server Actions aren't separate routes in this
+ * chain and must re-verify auth themselves rather than relying on proxy.
  */
-export function proxy(request: NextRequest): NextResponse {
-  const response = NextResponse.next();
-
-  if (request.cookies.has(LOCALE_COOKIE)) {
-    return response;
+function readSessionRole(request: NextRequest): string | null {
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  try {
+    const claims = decodeJwt(token) as { role?: string; exp?: number };
+    if (!claims.role) return null;
+    if (claims.exp && claims.exp * 1000 < Date.now()) return null;
+    return claims.role;
+  } catch {
+    return null;
   }
-
-  const locale = negotiateLocale(request.headers.get("accept-language"));
-  response.cookies.set(LOCALE_COOKIE, locale, {
-    path: "/",
-    maxAge: LOCALE_COOKIE_MAX_AGE_SECONDS,
-    sameSite: "lax",
-  });
-
-  return response;
 }
 
-function negotiateLocale(acceptLanguage: string | null): Locale {
-  if (!acceptLanguage) return DEFAULT_LOCALE;
+/** Strips a confirmed locale prefix (e.g. "/en/dashboard" -> "/dashboard"). */
+function stripLocalePrefix(pathname: string): string {
+  const match = routing.locales.find(
+    (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+  );
+  return match ? pathname.slice(`/${match}`.length) || "/" : pathname;
+}
 
-  const ranked = acceptLanguage
-    .split(",")
-    .map((part) => {
-      const [tag, qValue] = part.trim().split(";q=");
-      return {
-        tag: tag.split("-")[0].toLowerCase(),
-        quality: qValue ? parseFloat(qValue) : 1,
-      };
-    })
-    .sort((a, b) => b.quality - a.quality);
+export function proxy(request: NextRequest): NextResponse {
+  const intlResponse = intlMiddleware(request);
 
-  const match = ranked.find((entry) => SUPPORTED_CODES.includes(entry.tag));
-  return (match?.tag as Locale | undefined) ?? DEFAULT_LOCALE;
+  // next-intl is redirecting to add/normalize the locale prefix (localePrefix:
+  // "always" means every bare path gets one) — let that resolve first; the
+  // auth gate below re-runs on the follow-up request once the URL carries a
+  // confirmed locale segment, so path-stripping below is always safe.
+  if (intlResponse.status === 307 || intlResponse.status === 308) {
+    return intlResponse;
+  }
+
+  const pathname = request.nextUrl.pathname;
+  const path = stripLocalePrefix(pathname);
+  const localePrefix = pathname.slice(0, pathname.length - path.length);
+
+  if (path.startsWith("/dashboard")) {
+    const role = readSessionRole(request);
+    if (!role) {
+      return NextResponse.redirect(new URL(`${localePrefix}/login`, request.url));
+    }
+    if (path === "/dashboard" && role !== "MANAGER") {
+      return NextResponse.redirect(new URL(`${localePrefix}/dashboard/classes`, request.url));
+    }
+  }
+
+  return intlResponse;
 }
 
 export const config = {

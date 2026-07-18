@@ -18,6 +18,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
+import { AnalyticsService } from '../analytics/analytics.service';
+import { AnalyticsResponseDto } from '../analytics/dto/analytics-response.dto';
 
 @ApiTags('schools')
 @ApiBearerAuth()
@@ -26,7 +28,10 @@ import type { PaginatedResult } from '../common/interfaces/paginated-result.inte
 @Roles('MANAGER')
 @UseInterceptors(TenantCacheInterceptor)
 export class SchoolsController {
-  constructor(private readonly schoolsService: SchoolsService) {}
+  constructor(
+    private readonly schoolsService: SchoolsService,
+    private readonly analyticsService: AnalyticsService,
+  ) {}
 
   @Get()
   @Header('Cache-Control', 'private, max-age=30')
@@ -44,5 +49,14 @@ export class SchoolsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<SchoolResponseDto> {
     return this.schoolsService.findById(id, user.schoolId);
+  }
+
+  @Get(':id/analytics')
+  @Header('Cache-Control', 'private, max-age=30')
+  getAnalytics(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<AnalyticsResponseDto> {
+    return this.analyticsService.getSchoolAnalytics(id, user.schoolId);
   }
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { Link } from "@/i18n/navigation";
 
 interface Crumb {
   label: string;
@@ -55,7 +56,7 @@ export function MarketingBreadcrumbs({ crumbs, sectionId }: MarketingBreadcrumbs
           <li key={crumb.label} className="flex items-center gap-1.5">
             {i > 0 && <span aria-hidden="true">/</span>}
             {crumb.href ? (
-              <a
+              <Link
                 href={crumb.href}
                 className="hover:text-base-content transition-colors"
                 onClick={() => {
@@ -67,7 +68,7 @@ export function MarketingBreadcrumbs({ crumbs, sectionId }: MarketingBreadcrumbs
                 }}
               >
                 {crumb.label}
-              </a>
+              </Link>
             ) : (
               <span className="text-base-content/80 font-medium">{crumb.label}</span>
             )}

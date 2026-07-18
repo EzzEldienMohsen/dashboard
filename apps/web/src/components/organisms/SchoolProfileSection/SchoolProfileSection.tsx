@@ -14,7 +14,7 @@ export async function SchoolProfileSection({ profile }: SchoolProfileSectionProp
         <div className="p-8 md:p-12 flex flex-col gap-8">
           {/* Mission */}
           <div className="flex flex-col gap-3">
-            <h2 className="text-lg font-semibold text-base-content/60 uppercase tracking-wide text-sm">
+            <h2 className="text-sm font-semibold text-base-content/60 uppercase tracking-wide">
               {t("mission")}
             </h2>
             <p className="text-base-content text-lg leading-relaxed">{profile.mission}</p>

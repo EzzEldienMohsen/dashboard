@@ -197,5 +197,52 @@
       "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
       "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
     }
+  },
+  "dashboard": {
+    "nav": {
+      "sidebarLabel": "التنقل في لوحة التحكم",
+      "overview": "نظرة عامة",
+      "classes": "الفصول",
+      "students": "الطلاب",
+      "logout": "تسجيل الخروج"
+    },
+    "overview": {
+      "title": "نظرة عامة",
+      "attendanceBreakdownTitle": "تفاصيل الحضور",
+      "gradesBySubjectTitle": "الدرجات حسب المادة",
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "excused": "معذور"
+    },
+    "common": {
+      "previous": "السابق",
+      "next": "التالي",
+      "pageOf": "صفحة {page} من {totalPages}",
+      "allClasses": "جميع الفصول",
+      "filterByClass": "تصفية حسب الفصل"
+    },
+    "error": {
+      "title": "حدث خطأ ما",
+      "message": "تعذّر تحميل هذه الصفحة. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى"
+    },
+    "loading": "جارٍ التحميل…"
+  },
+  "schools": {
+    "address": "العنوان",
+    "noAddress": "لا يوجد عنوان مسجل"
+  },
+  "classes": {
+    "title": "الفصول",
+    "columnName": "الاسم",
+    "empty": "لم يتم العثور على فصول."
+  },
+  "students": {
+    "title": "الطلاب",
+    "columnFirstName": "الاسم الأول",
+    "columnLastName": "اسم العائلة",
+    "columnClass": "الفصل",
+    "empty": "لم يتم العثور على طلاب."
   }
 }

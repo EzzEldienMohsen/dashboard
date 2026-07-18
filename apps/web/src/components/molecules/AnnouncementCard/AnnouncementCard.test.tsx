@@ -1,6 +1,15 @@
-import { describe, expect, it } from "vitest";
+import type { ComponentProps } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AnnouncementCard } from "./AnnouncementCard";
+
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({ href, children, ...props }: ComponentProps<"a">) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 describe("AnnouncementCard", () => {
   it("renders title, category badge, and truncates a long body", () => {

@@ -4,8 +4,8 @@ export async function HowItWorksSection() {
   const t = await getTranslations("features.howItWorks");
 
   const steps = Array.from({ length: 3 }, (_, i) => ({
-    title: t(`steps.${i}.title` as Parameters<typeof t>[0]),
-    desc: t(`steps.${i}.desc` as Parameters<typeof t>[0]),
+    title: t(`steps.${i}.title`),
+    desc: t(`steps.${i}.desc`),
     step: i + 1,
   }));
 

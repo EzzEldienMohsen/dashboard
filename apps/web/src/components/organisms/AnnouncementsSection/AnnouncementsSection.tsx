@@ -1,17 +1,22 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
 import { AnnouncementCard } from "@/components/molecules/AnnouncementCard";
-import { getAnnouncements } from "@/lib/api";
+import type { PaginatedAnnouncements } from "@/lib/api/types";
 
 interface AnnouncementsSectionProps {
   limit: number;
+  /** Injected fetcher — keeps this organism swappable/testable in isolation. */
+  fetchAnnouncements: (limit: number) => Promise<PaginatedAnnouncements>;
 }
 
-export async function AnnouncementsSection({ limit }: AnnouncementsSectionProps) {
+export async function AnnouncementsSection({
+  limit,
+  fetchAnnouncements,
+}: AnnouncementsSectionProps) {
   const [t, tAnnouncements, { items: announcements }] = await Promise.all([
     getTranslations("home.announcements"),
     getTranslations("announcements"),
-    getAnnouncements(limit),
+    fetchAnnouncements(limit),
   ]);
 
   return (
@@ -29,7 +34,7 @@ export async function AnnouncementsSection({ limit }: AnnouncementsSectionProps)
               key={a.id}
               {...a}
               categoryLabel={tAnnouncements(
-                `categories.${a.category}` as Parameters<typeof tAnnouncements>[0],
+                `categories.${a.category}`,
               )}
               readMoreLabel={tAnnouncements("readMore")}
             />

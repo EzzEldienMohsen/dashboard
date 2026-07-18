@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { LogoMark } from "@/components/atoms/LogoMark";
 import { LanguageSwitcher } from "@/components/molecules/LanguageSwitcher";
 import { ThemeToggle } from "@/components/atoms/ThemeToggle";

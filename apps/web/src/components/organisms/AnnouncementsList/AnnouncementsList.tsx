@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { AnnouncementCard } from "@/components/molecules/AnnouncementCard";
 import type { Announcement } from "@/lib/api/types";
@@ -16,8 +16,10 @@ export function AnnouncementsList({ announcements }: AnnouncementsListProps) {
   const t = useTranslations("announcements");
   const [active, setActive] = useState<string>("ALL");
 
-  const filtered =
-    active === "ALL" ? announcements : announcements.filter((a) => a.category === active);
+  const filtered = useMemo(
+    () => (active === "ALL" ? announcements : announcements.filter((a) => a.category === active)),
+    [active, announcements],
+  );
 
   return (
     <div>
@@ -35,7 +37,7 @@ export function AnnouncementsList({ announcements }: AnnouncementsListProps) {
             className={`btn btn-sm ${active === cat ? "btn-primary" : "btn-ghost border border-base-300"}`}
             onClick={() => setActive(cat)}
           >
-            {t(`categories.${cat}` as Parameters<typeof t>[0])}
+            {t(`categories.${cat}`)}
           </button>
         ))}
       </div>
@@ -48,7 +50,7 @@ export function AnnouncementsList({ announcements }: AnnouncementsListProps) {
             <AnnouncementCard
               key={a.id}
               {...a}
-              categoryLabel={t(`categories.${a.category}` as Parameters<typeof t>[0])}
+              categoryLabel={t(`categories.${a.category}`)}
               readMoreLabel={t("readMore")}
             />
           ))}

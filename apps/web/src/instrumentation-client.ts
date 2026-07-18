@@ -9,7 +9,8 @@ Sentry.init({
       breadcrumb.category === "ui.input" || breadcrumb.category === "ui.click";
     if (!isSensitiveUiEvent) return breadcrumb;
 
-    const target = hint?.event?.target as HTMLElement | undefined;
+    const domEvent = hint?.event as unknown as Event | undefined;
+    const target = domEvent?.target as HTMLElement | undefined;
     const isPasswordField =
       target?.getAttribute?.("type") === "password" ||
       ["password", "confirmPassword"].includes(target?.getAttribute?.("name") ?? "");
