@@ -6,27 +6,26 @@ interface FeatureCardGridProps {
 
 const ICONS = ["📚", "🗓️", "📢", "👥", "🏫", "📋"] as const;
 
+// New variants extend this map, never the JSX below (open/closed).
+const GRID_VARIANTS = {
+  compact: { count: 3, gridClass: "grid-cols-1 md:grid-cols-3" },
+  full: { count: 6, gridClass: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" },
+} as const satisfies Record<string, { count: number; gridClass: string }>;
+
 export async function FeatureCardGrid({ variant }: FeatureCardGridProps) {
   const t = await getTranslations("features.grid");
+  const { count, gridClass } = GRID_VARIANTS[variant];
 
-  const allItems = Array.from({ length: 6 }, (_, i) => ({
+  const items = Array.from({ length: count }, (_, i) => ({
     title: t(`items.${i}.title` as Parameters<typeof t>[0]),
     desc: t(`items.${i}.desc` as Parameters<typeof t>[0]),
     icon: ICONS[i],
   }));
 
-  const items = variant === "compact" ? allItems.slice(0, 3) : allItems;
-
   return (
     <section className="py-16">
       <h2 className="text-2xl font-bold text-base-content mb-8">{t("heading")}</h2>
-      <div
-        className={`grid gap-6 ${
-          variant === "compact"
-            ? "grid-cols-1 md:grid-cols-3"
-            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-        }`}
-      >
+      <div className={`grid gap-6 ${gridClass}`}>
         {items.map((item) => (
           <div
             key={item.title}

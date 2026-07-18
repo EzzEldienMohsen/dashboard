@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Version, VERSION_NEUTRAL } from '@nestjs/common';
 import {
   HealthCheck,
   HealthCheckService,
@@ -16,7 +16,11 @@ export class HealthController {
     private readonly prisma: PrismaService,
   ) {}
 
+  // Version-neutral: monitoring/orchestrators expect a stable /health path, not /v1/health.
+  // @Version() must be method-level here — like @Header(), applying it at the class level
+  // crashes at module-load time ("Cannot read properties of undefined (reading 'value')").
   @Get()
+  @Version(VERSION_NEUTRAL)
   @HealthCheck()
   check(): Promise<HealthCheckResult> {
     return this.health.check([

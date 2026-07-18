@@ -118,6 +118,7 @@
     "publishedOn": "نُشر في {date}"
   },
   "stats": {
+    "heading": "أرقامنا",
     "schools": "المدارس",
     "students": "الطلاب",
     "teachers": "المعلمون"

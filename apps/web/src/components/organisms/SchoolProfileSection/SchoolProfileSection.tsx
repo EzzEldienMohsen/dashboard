@@ -1,13 +1,5 @@
 import { getTranslations } from "next-intl/server";
-
-interface SchoolProfile {
-  name: string;
-  mission: string;
-  foundedYear: number;
-  address: string;
-  contactEmail: string;
-  contactPhone: string | null;
-}
+import type { SchoolProfile } from "@/lib/api/types";
 
 interface SchoolProfileSectionProps {
   profile: SchoolProfile;

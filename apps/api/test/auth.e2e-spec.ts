@@ -33,7 +33,7 @@ describe('AuthController (e2e)', () => {
       const email = `e2e-test-${Date.now()}@example.com`;
 
       const res = await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/v1/auth/register')
         .send({
           role: 'TEACHER',
           schoolId,
@@ -56,7 +56,7 @@ describe('AuthController (e2e)', () => {
 
     it('rejects a duplicate email with 409', async () => {
       const res = await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/v1/auth/register')
         .send({
           role: 'TEACHER',
           schoolId,
@@ -76,7 +76,7 @@ describe('AuthController (e2e)', () => {
 
     it('rejects a mismatched confirmPassword with 400', async () => {
       await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/v1/auth/register')
         .send({
           role: 'TEACHER',
           schoolId,
@@ -92,7 +92,7 @@ describe('AuthController (e2e)', () => {
 
     it('rejects an unknown schoolId with 404', async () => {
       const res = await request(app.getHttpServer())
-        .post('/auth/register')
+        .post('/v1/auth/register')
         .send({
           role: 'TEACHER',
           schoolId: 'does-not-exist',
@@ -114,7 +114,7 @@ describe('AuthController (e2e)', () => {
   describe('login', () => {
     it('returns an access token for valid credentials', async () => {
       const res = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/v1/auth/login')
         .send({
           email: 'manager@schooldashboard.dev',
           password: 'Password123!',
@@ -128,7 +128,7 @@ describe('AuthController (e2e)', () => {
 
     it('rejects an unknown email with 401', async () => {
       const res = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/v1/auth/login')
         .send({ email: 'nobody@schooldashboard.dev', password: 'Password123!' })
         .expect(401);
 
@@ -139,7 +139,7 @@ describe('AuthController (e2e)', () => {
 
     it('rejects a wrong password with 401', async () => {
       const res = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/v1/auth/login')
         .send({
           email: 'manager@schooldashboard.dev',
           password: 'WrongPassword1!',
@@ -155,7 +155,7 @@ describe('AuthController (e2e)', () => {
   describe('authenticated request caching', () => {
     it('resolves the JWT user from cache on the second request, skipping the repository', async () => {
       const login = await request(app.getHttpServer())
-        .post('/auth/login')
+        .post('/v1/auth/login')
         .send({
           email: 'manager@schooldashboard.dev',
           password: 'Password123!',
@@ -167,11 +167,11 @@ describe('AuthController (e2e)', () => {
       spy.mockClear();
 
       await request(app.getHttpServer())
-        .get('/schools')
+        .get('/v1/schools')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       await request(app.getHttpServer())
-        .get('/schools')
+        .get('/v1/schools')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
 

@@ -6,6 +6,8 @@ import { MarketingBreadcrumbs } from "@/components/organisms/MarketingBreadcrumb
 import { getAnnouncements, getAnnouncementById } from "@/lib/api";
 import { getCategoryBadgeClass } from "@/lib/announcements/category";
 import { ANNOUNCEMENTS_FETCH_LIMIT } from "@/lib/config/site";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { JsonLd } from "@/lib/seo/JsonLd";
 
 export const revalidate = 3600;
 
@@ -23,17 +25,12 @@ export async function generateMetadata({
   const announcement = await getAnnouncementById(id);
   if (!announcement) return { title: "Announcement" };
   const description = announcement.body.slice(0, 160).trimEnd();
-  return {
+  return buildPageMetadata({
     title: announcement.title,
     description,
-    alternates: { canonical: `/announcements/${id}` },
-    openGraph: {
-      title: announcement.title,
-      description,
-      type: "article",
-      url: `/announcements/${id}`,
-    },
-  };
+    path: `/announcements/${id}`,
+    type: "article",
+  });
 }
 
 export default async function AnnouncementDetailPage({
@@ -79,10 +76,7 @@ export default async function AnnouncementDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <div className="w-[90%] max-w-3xl mx-auto py-12">
         <MarketingBreadcrumbs
           crumbs={[

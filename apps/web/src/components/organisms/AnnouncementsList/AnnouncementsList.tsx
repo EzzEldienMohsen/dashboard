@@ -3,20 +3,14 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { AnnouncementCard } from "@/components/molecules/AnnouncementCard";
-
-interface Announcement {
-  id: string;
-  title: string;
-  body: string;
-  category: string;
-  publishedAt: string;
-}
+import type { Announcement } from "@/lib/api/types";
+import { CATEGORY_BADGE_CLASS } from "@/lib/announcements/category";
 
 interface AnnouncementsListProps {
   announcements: Announcement[];
 }
 
-const CATEGORIES = ["ALL", "GENERAL", "EVENT", "EXAM", "HOLIDAY", "URGENT"] as const;
+const CATEGORIES = ["ALL", ...Object.keys(CATEGORY_BADGE_CLASS)] as const;
 
 export function AnnouncementsList({ announcements }: AnnouncementsListProps) {
   const t = useTranslations("announcements");

@@ -1,9 +1,9 @@
 export const CATEGORY_BADGE_CLASS: Record<string, string> = {
-  URGENT: "badge-error",
-  EXAM: "badge-warning",
-  EVENT: "badge-info",
-  HOLIDAY: "badge-success",
   GENERAL: "badge-neutral",
+  EVENT: "badge-info",
+  EXAM: "badge-warning",
+  HOLIDAY: "badge-success",
+  URGENT: "badge-error",
 };
 
 export function getCategoryBadgeClass(category: string): string {

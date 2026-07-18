@@ -24,12 +24,12 @@ describe('SchoolsController (e2e)', () => {
     prisma = app.get(PrismaService);
 
     const managerLogin = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/v1/auth/login')
       .send({ email: 'manager@schooldashboard.dev', password: 'Password123!' });
     managerToken = (managerLogin.body as AuthResponseDto).accessToken;
 
     const teacherLogin = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/v1/auth/login')
       .send({ email: 'teacher@schooldashboard.dev', password: 'Password123!' });
     teacherToken = (teacherLogin.body as AuthResponseDto).accessToken;
 
@@ -46,7 +46,7 @@ describe('SchoolsController (e2e)', () => {
 
   it('returns a paginated list for a manager', async () => {
     const res = await request(app.getHttpServer())
-      .get('/schools')
+      .get('/v1/schools')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
     const body = res.body as PaginatedResult<SchoolResponseDto>;
@@ -59,24 +59,24 @@ describe('SchoolsController (e2e)', () => {
 
   it('forbids a teacher from listing schools', async () => {
     await request(app.getHttpServer())
-      .get('/schools')
+      .get('/v1/schools')
       .set('Authorization', `Bearer ${teacherToken}`)
       .expect(403);
   });
 
   it('rejects an unauthenticated request', async () => {
-    await request(app.getHttpServer()).get('/schools').expect(401);
+    await request(app.getHttpServer()).get('/v1/schools').expect(401);
   });
 
   it('fetches a school by id', async () => {
     const list = await request(app.getHttpServer())
-      .get('/schools')
+      .get('/v1/schools')
       .set('Authorization', `Bearer ${managerToken}`);
     const schoolId = (list.body as PaginatedResult<SchoolResponseDto>).items[0]
       .id;
 
     const res = await request(app.getHttpServer())
-      .get(`/schools/${schoolId}`)
+      .get(`/v1/schools/${schoolId}`)
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
 
@@ -85,7 +85,7 @@ describe('SchoolsController (e2e)', () => {
 
   it('returns a mapped 404 for an unknown id', async () => {
     const res = await request(app.getHttpServer())
-      .get('/schools/does-not-exist')
+      .get('/v1/schools/does-not-exist')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(404);
 
@@ -94,7 +94,7 @@ describe('SchoolsController (e2e)', () => {
 
   it('returns 404 for a different school, never leaking cross-tenant data', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/schools/${otherSchoolId}`)
+      .get(`/v1/schools/${otherSchoolId}`)
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(404);
 
@@ -103,7 +103,7 @@ describe('SchoolsController (e2e)', () => {
 
   it('never includes another school in the list results', async () => {
     const res = await request(app.getHttpServer())
-      .get('/schools')
+      .get('/v1/schools')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
     const body = res.body as PaginatedResult<SchoolResponseDto>;
@@ -113,14 +113,14 @@ describe('SchoolsController (e2e)', () => {
 
   it('rejects an out-of-range page', async () => {
     await request(app.getHttpServer())
-      .get('/schools?page=0')
+      .get('/v1/schools?page=0')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(400);
   });
 
   it('rejects a limit above the max', async () => {
     await request(app.getHttpServer())
-      .get('/schools?limit=101')
+      .get('/v1/schools?limit=101')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(400);
   });
@@ -131,11 +131,11 @@ describe('SchoolsController (e2e)', () => {
     spy.mockClear();
 
     await request(app.getHttpServer())
-      .get('/schools?page=1&limit=5')
+      .get('/v1/schools?page=1&limit=5')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
     await request(app.getHttpServer())
-      .get('/schools?page=1&limit=5')
+      .get('/v1/schools?page=1&limit=5')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
 

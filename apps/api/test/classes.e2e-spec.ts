@@ -27,17 +27,17 @@ describe('ClassesController (e2e)', () => {
     prisma = app.get(PrismaService);
 
     const managerLogin = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/v1/auth/login')
       .send({ email: 'manager@schooldashboard.dev', password: 'Password123!' });
     managerToken = (managerLogin.body as AuthResponseDto).accessToken;
 
     const teacherLogin = await request(app.getHttpServer())
-      .post('/auth/login')
+      .post('/v1/auth/login')
       .send({ email: 'teacher@schooldashboard.dev', password: 'Password123!' });
     teacherToken = (teacherLogin.body as AuthResponseDto).accessToken;
 
     const schools = await request(app.getHttpServer())
-      .get('/schools')
+      .get('/v1/schools')
       .set('Authorization', `Bearer ${managerToken}`);
     schoolId = (schools.body as PaginatedResult<SchoolResponseDto>).items[0].id;
 
@@ -62,7 +62,7 @@ describe('ClassesController (e2e)', () => {
 
   it('returns a paginated list for a manager', async () => {
     const res = await request(app.getHttpServer())
-      .get('/classes')
+      .get('/v1/classes')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
 
@@ -73,18 +73,18 @@ describe('ClassesController (e2e)', () => {
 
   it('also allows a teacher to list classes', async () => {
     await request(app.getHttpServer())
-      .get('/classes')
+      .get('/v1/classes')
       .set('Authorization', `Bearer ${teacherToken}`)
       .expect(200);
   });
 
   it('rejects an unauthenticated request', async () => {
-    await request(app.getHttpServer()).get('/classes').expect(401);
+    await request(app.getHttpServer()).get('/v1/classes').expect(401);
   });
 
   it('only ever returns classes belonging to the caller school', async () => {
     const res = await request(app.getHttpServer())
-      .get('/classes?limit=100')
+      .get('/v1/classes?limit=100')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
     const body = res.body as PaginatedResult<ClassResponseDto>;
@@ -98,14 +98,14 @@ describe('ClassesController (e2e)', () => {
 
   it('rejects a client-supplied schoolId query param', async () => {
     await request(app.getHttpServer())
-      .get(`/classes?schoolId=${otherSchoolId}`)
+      .get(`/v1/classes?schoolId=${otherSchoolId}`)
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(400);
   });
 
   it('returns 404 for a class belonging to another school', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/classes/${otherClassId}`)
+      .get(`/v1/classes/${otherClassId}`)
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(404);
 
@@ -114,13 +114,13 @@ describe('ClassesController (e2e)', () => {
 
   it('fetches a class by id', async () => {
     const list = await request(app.getHttpServer())
-      .get('/classes')
+      .get('/v1/classes')
       .set('Authorization', `Bearer ${managerToken}`);
     const classId = (list.body as PaginatedResult<ClassResponseDto>).items[0]
       .id;
 
     const res = await request(app.getHttpServer())
-      .get(`/classes/${classId}`)
+      .get(`/v1/classes/${classId}`)
       .set('Authorization', `Bearer ${teacherToken}`)
       .expect(200);
 
@@ -129,7 +129,7 @@ describe('ClassesController (e2e)', () => {
 
   it('returns a mapped 404 for an unknown id', async () => {
     const res = await request(app.getHttpServer())
-      .get('/classes/does-not-exist')
+      .get('/v1/classes/does-not-exist')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(404);
 
@@ -138,7 +138,7 @@ describe('ClassesController (e2e)', () => {
 
   it('rejects an out-of-range page', async () => {
     await request(app.getHttpServer())
-      .get('/classes?page=0')
+      .get('/v1/classes?page=0')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(400);
   });
@@ -149,11 +149,11 @@ describe('ClassesController (e2e)', () => {
     spy.mockClear();
 
     await request(app.getHttpServer())
-      .get('/classes?page=1&limit=5')
+      .get('/v1/classes?page=1&limit=5')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
     await request(app.getHttpServer())
-      .get('/classes?page=1&limit=5')
+      .get('/v1/classes?page=1&limit=5')
       .set('Authorization', `Bearer ${managerToken}`)
       .expect(200);
 

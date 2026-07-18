@@ -10,6 +10,7 @@ export async function StatsSection() {
 
   return (
     <section className="py-16">
+      <h2 className="sr-only">{t("heading")}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <StatCard count={schoolsCount} label={t("schools")} />
         <StatCard count={studentsCount} label={t("students")} />

@@ -7,6 +7,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TenantCacheInterceptor } from '../common/interceptors/tenant-cache.interceptor';
 import { SchoolsService } from './schools.service';
 import { SchoolResponseDto } from './dto/school-response.dto';
@@ -18,6 +19,8 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 
+@ApiTags('schools')
+@ApiBearerAuth()
 @Controller('schools')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('MANAGER')

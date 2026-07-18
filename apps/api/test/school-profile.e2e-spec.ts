@@ -30,7 +30,7 @@ describe('SchoolProfileController (e2e)', () => {
     spy.mockClear();
 
     const res = await request(app.getHttpServer())
-      .get('/school-profile')
+      .get('/v1/school-profile')
       .expect(200);
     const body = res.body as SchoolProfileResponseDto;
 
@@ -38,7 +38,7 @@ describe('SchoolProfileController (e2e)', () => {
     expect(typeof body.name).toBe('string');
     expect(typeof body.mission).toBe('string');
 
-    await request(app.getHttpServer()).get('/school-profile').expect(200);
+    await request(app.getHttpServer()).get('/v1/school-profile').expect(200);
 
     expect(spy).toHaveBeenCalledTimes(1);
     spy.mockRestore();

@@ -118,3 +118,17 @@ model GradeRecord {
 
   @@index([studentId, subject])
 }
+
+// No FK to User by design — audit rows must survive user deletion.
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String
+  action       String
+  resourceType String
+  resourceId   String
+  timestamp    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([resourceType, resourceId])
+}

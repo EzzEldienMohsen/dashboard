@@ -22,7 +22,7 @@ describe('AnnouncementsController (e2e)', () => {
 
   it('returns a paginated list without authentication', async () => {
     const res = await request(app.getHttpServer())
-      .get('/announcements')
+      .get('/v1/announcements')
       .expect(200);
     const body = res.body as PaginatedResult<AnnouncementResponseDto>;
 
@@ -34,7 +34,7 @@ describe('AnnouncementsController (e2e)', () => {
 
   it('filters by category', async () => {
     const res = await request(app.getHttpServer())
-      .get('/announcements?category=EXAM')
+      .get('/v1/announcements?category=EXAM')
       .expect(200);
     const body = res.body as PaginatedResult<AnnouncementResponseDto>;
 
@@ -44,18 +44,18 @@ describe('AnnouncementsController (e2e)', () => {
 
   it('rejects an invalid category', async () => {
     await request(app.getHttpServer())
-      .get('/announcements?category=NOT_A_CATEGORY')
+      .get('/v1/announcements?category=NOT_A_CATEGORY')
       .expect(400);
   });
 
   it('fetches an announcement by id', async () => {
-    const list = await request(app.getHttpServer()).get('/announcements');
+    const list = await request(app.getHttpServer()).get('/v1/announcements');
     const announcementId = (
       list.body as PaginatedResult<AnnouncementResponseDto>
     ).items[0].id;
 
     const res = await request(app.getHttpServer())
-      .get(`/announcements/${announcementId}`)
+      .get(`/v1/announcements/${announcementId}`)
       .expect(200);
 
     expect((res.body as AnnouncementResponseDto).id).toBe(announcementId);
@@ -63,7 +63,7 @@ describe('AnnouncementsController (e2e)', () => {
 
   it('returns a mapped 404 for an unknown id', async () => {
     const res = await request(app.getHttpServer())
-      .get('/announcements/does-not-exist')
+      .get('/v1/announcements/does-not-exist')
       .expect(404);
 
     expect((res.body as ErrorResponseBody).errorCode).toBe(
@@ -72,7 +72,9 @@ describe('AnnouncementsController (e2e)', () => {
   });
 
   it('rejects an out-of-range page', async () => {
-    await request(app.getHttpServer()).get('/announcements?page=0').expect(400);
+    await request(app.getHttpServer())
+      .get('/v1/announcements?page=0')
+      .expect(400);
   });
 
   it('serves the second identical request from cache without hitting the repository', async () => {
@@ -83,10 +85,10 @@ describe('AnnouncementsController (e2e)', () => {
     spy.mockClear();
 
     await request(app.getHttpServer())
-      .get('/announcements?page=1&limit=5')
+      .get('/v1/announcements?page=1&limit=5')
       .expect(200);
     await request(app.getHttpServer())
-      .get('/announcements?page=1&limit=5')
+      .get('/v1/announcements?page=1&limit=5')
       .expect(200);
 
     expect(spy).toHaveBeenCalledTimes(1);

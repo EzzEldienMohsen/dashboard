@@ -118,6 +118,7 @@
     "publishedOn": "Published on {date}"
   },
   "stats": {
+    "heading": "Our numbers",
     "schools": "Schools",
     "students": "Students",
     "teachers": "Teachers"

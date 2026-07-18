@@ -1,9 +1,10 @@
 import { REVALIDATE_SECONDS } from "@/lib/config/site";
 
 const INTERNAL_API_URL = process.env.INTERNAL_API_URL ?? "http://localhost:3000";
+const API_VERSION_PREFIX = "/v1";
 
 export async function apiFetch<T>(path: string): Promise<T | null> {
-  const url = `${INTERNAL_API_URL}${path}`;
+  const url = `${INTERNAL_API_URL}${API_VERSION_PREFIX}${path}`;
   try {
     const res = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
     if (res.ok) return (await res.json()) as T;

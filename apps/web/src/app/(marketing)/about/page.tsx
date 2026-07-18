@@ -5,23 +5,19 @@ import { MarketingPageTemplate } from "@/components/templates/MarketingPageTempl
 import { SchoolProfileSection } from "@/components/organisms/SchoolProfileSection";
 import { CTAStrip } from "@/components/organisms/CTAStrip";
 import { getSchoolProfile } from "@/lib/api";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { JsonLd } from "@/lib/seo/JsonLd";
 
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("about");
   const { name: schoolName } = await getSchoolProfile();
-  return {
+  return buildPageMetadata({
     title: t("metaTitle", { schoolName }),
     description: t("metaDescription", { schoolName }),
-    alternates: { canonical: "/about" },
-    openGraph: {
-      title: t("metaTitle", { schoolName }),
-      description: t("metaDescription", { schoolName }),
-      type: "website",
-      url: "/about",
-    },
-  };
+    path: "/about",
+  });
 }
 
 export default async function AboutPage() {
@@ -49,10 +45,7 @@ export default async function AboutPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <MarketingPageTemplate
         hero={
           <section className="py-20 text-center">

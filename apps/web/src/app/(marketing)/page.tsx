@@ -10,23 +10,19 @@ import { AnnouncementsSection } from "@/components/organisms/AnnouncementsSectio
 import { CTAStrip } from "@/components/organisms/CTAStrip";
 import { FadeInSection } from "@/components/atoms/FadeInSection";
 import { getSchoolProfile } from "@/lib/api";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { JsonLd } from "@/lib/seo/JsonLd";
 
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("home");
   const { name: schoolName } = await getSchoolProfile();
-  return {
+  return buildPageMetadata({
     title: t("metaTitle", { schoolName }),
     description: t("metaDescription"),
-    alternates: { canonical: "/" },
-    openGraph: {
-      title: t("metaTitle", { schoolName }),
-      description: t("metaDescription"),
-      type: "website",
-      url: "/",
-    },
-  };
+    path: "/",
+  });
 }
 
 export default async function HomePage() {
@@ -53,10 +49,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <MarketingPageTemplate
         hero={<HeroSection schoolName={profile.name} mission={profile.mission} />}
       >

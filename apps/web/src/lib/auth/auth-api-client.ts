@@ -50,7 +50,7 @@ export class NestAuthApiClient implements AuthApiClient {
   ): Promise<AuthApiResult> {
     let response: Response;
     try {
-      response = await fetch(`${this.baseUrl}/auth/${path}`, {
+      response = await fetch(`${this.baseUrl}/v1/auth/${path}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),

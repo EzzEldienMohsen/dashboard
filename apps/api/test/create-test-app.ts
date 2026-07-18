@@ -3,6 +3,7 @@ import {
   ClassSerializerInterceptor,
   INestApplication,
   ValidationPipe,
+  VersioningType,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { App } from 'supertest/types';
@@ -26,6 +27,11 @@ export async function createTestApp(): Promise<INestApplication<App>> {
   }).compile();
 
   const app = moduleFixture.createNestApplication<INestApplication<App>>();
+
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
