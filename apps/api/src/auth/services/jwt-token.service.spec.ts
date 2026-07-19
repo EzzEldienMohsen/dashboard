@@ -10,6 +10,7 @@ describe('JwtTokenService', () => {
     sub: 'user-1',
     email: 'user@example.com',
     role: 'MANAGER',
+    schoolId: 'school-1',
   };
 
   beforeEach(() => {

@@ -3,8 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { AttendanceBreakdownCard } from "./AttendanceBreakdownCard";
 import type { AttendanceBreakdownDto } from "@/lib/data";
 
-vi.mock("next-intl/server", () => ({
-  getTranslations: vi.fn().mockResolvedValue((key: string) => key),
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
 }));
 
 vi.mock("@/components/atoms/DoughnutChart", () => ({
@@ -26,18 +26,31 @@ describe("AttendanceBreakdownCard", () => {
     excused: 5,
   };
 
-  it("renders the title and the attendance rate percentage", async () => {
+  it("renders the title and the attendance rate percentage", () => {
     render(
-      await AttendanceBreakdownCard({ breakdown, attendanceRatePercentage: 90 }),
+      <AttendanceBreakdownCard breakdown={breakdown} attendanceRatePercentage={90} />,
     );
 
     expect(screen.getByText("attendanceBreakdownTitle")).toBeInTheDocument();
     expect(screen.getByText("90%")).toBeInTheDocument();
   });
 
-  it("passes status labels and values through to the DoughnutChart in present/absent/late/excused order", async () => {
+  it("renders a custom title when provided instead of the default translation", () => {
     render(
-      await AttendanceBreakdownCard({ breakdown, attendanceRatePercentage: 90 }),
+      <AttendanceBreakdownCard
+        breakdown={breakdown}
+        attendanceRatePercentage={90}
+        title="Commitment"
+      />,
+    );
+
+    expect(screen.getByText("Commitment")).toBeInTheDocument();
+    expect(screen.queryByText("attendanceBreakdownTitle")).not.toBeInTheDocument();
+  });
+
+  it("passes status labels and values through to the DoughnutChart in present/absent/late/excused order", () => {
+    render(
+      <AttendanceBreakdownCard breakdown={breakdown} attendanceRatePercentage={90} />,
     );
 
     const chart = screen.getByTestId("doughnut-chart");

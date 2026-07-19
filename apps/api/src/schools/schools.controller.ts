@@ -20,6 +20,9 @@ import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { AnalyticsResponseDto } from '../analytics/dto/analytics-response.dto';
+import { MonthlyAnalyticsResponseDto } from '../analytics/dto/monthly-analytics-response.dto';
+import { MonthlyAnalyticsQueryDto } from '../analytics/dto/monthly-analytics-query.dto';
+import { ClassSummaryResponseDto } from '../analytics/dto/class-summary-response.dto';
 
 @ApiTags('schools')
 @ApiBearerAuth()
@@ -58,5 +61,28 @@ export class SchoolsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<AnalyticsResponseDto> {
     return this.analyticsService.getSchoolAnalytics(id, user.schoolId);
+  }
+
+  @Get(':id/analytics/monthly')
+  @Header('Cache-Control', 'private, max-age=30')
+  getMonthlyAnalytics(
+    @Param('id') id: string,
+    @Query() query: MonthlyAnalyticsQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<MonthlyAnalyticsResponseDto[]> {
+    return this.analyticsService.getSchoolMonthlyAnalytics(
+      id,
+      user.schoolId,
+      query.months,
+    );
+  }
+
+  @Get(':id/classes/analytics-summary')
+  @Header('Cache-Control', 'private, max-age=30')
+  getClassesAnalyticsSummary(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<ClassSummaryResponseDto[]> {
+    return this.analyticsService.getClassesSummaryForSchool(id, user.schoolId);
   }
 }

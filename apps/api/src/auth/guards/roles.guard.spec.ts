@@ -41,6 +41,7 @@ describe('RolesGuard', () => {
         id: 'user-1',
         email: 'jane@example.com',
         role: 'MANAGER',
+        schoolId: 'school-1',
       }),
     );
 
@@ -56,6 +57,7 @@ describe('RolesGuard', () => {
           id: 'user-2',
           email: 'joe@example.com',
           role: 'TEACHER',
+          schoolId: 'school-1',
         }),
       ),
     ).toThrow(ForbiddenException);

@@ -3,9 +3,11 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
+import * as Sentry from "@sentry/nextjs";
 import { DataTable, type DataTableColumn } from "@/components/molecules/DataTable";
 import { Select } from "@/components/atoms/Select";
 import { Label } from "@/components/atoms/Label";
+import { Link } from "@/i18n/navigation";
 import type { ClassDto, PaginatedResult, StudentDto } from "@/lib/data";
 
 export interface StudentsSectionProps {
@@ -47,7 +49,25 @@ export function StudentsSection({
 
   const columns: DataTableColumn<StudentDto>[] = useMemo(
     () => [
-      { key: "firstName", header: t("columnFirstName"), render: (row) => row.firstName },
+      {
+        key: "firstName",
+        header: t("columnFirstName"),
+        render: (row) => (
+          <Link
+            href={`/dashboard/students/${row.id}`}
+            className="link link-primary"
+            onClick={() => {
+              Sentry.addBreadcrumb({
+                category: "navigation",
+                message: "student-row-clicked",
+                data: { studentId: row.id },
+              });
+            }}
+          >
+            {row.firstName}
+          </Link>
+        ),
+      },
       { key: "lastName", header: t("columnLastName"), render: (row) => row.lastName },
       {
         key: "class",

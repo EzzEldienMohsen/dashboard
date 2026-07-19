@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -7,6 +8,16 @@ import type { ClassDto, PaginatedResult, StudentDto } from "@/lib/data";
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
+
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({ href, children, ...props }: ComponentProps<"a">) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
+vi.mock("@sentry/nextjs", () => ({ addBreadcrumb: vi.fn() }));
 
 const classOptions: ClassDto[] = [
   { id: "class-1", name: "Grade 5-A", schoolId: "school-1" },
@@ -40,6 +51,23 @@ describe("StudentsSection", () => {
     expect(screen.getByText("Amy")).toBeInTheDocument();
     expect(screen.getByText("Lee")).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "Grade 5-A" })).toBeInTheDocument();
+  });
+
+  it("links the student's first name to their detail page", () => {
+    const fetchStudents = vi.fn(() => new Promise<never>(() => {}));
+
+    renderWithQueryClient(
+      <StudentsSection
+        initialData={initialData}
+        classOptions={classOptions}
+        fetchStudents={fetchStudents}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Amy" })).toHaveAttribute(
+      "href",
+      "/dashboard/students/s1",
+    );
   });
 
   it("passes the current page to fetchStudents on page change", async () => {

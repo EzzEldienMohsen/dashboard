@@ -1,7 +1,15 @@
 export { getMySchool } from "./schools";
-export { getClasses } from "./classes";
-export { getStudents } from "./students";
-export { getSchoolAnalytics, getClassAnalytics } from "./analytics";
+export { getClasses, getClassById } from "./classes";
+export { getStudents, getStudentById } from "./students";
+export {
+  getSchoolAnalytics,
+  getClassAnalytics,
+  getStudentAnalytics,
+  getSchoolMonthlyAnalytics,
+  getClassMonthlyAnalytics,
+  getStudentMonthlyAnalytics,
+  getClassesSummary,
+} from "./analytics";
 export type {
   PaginatedResult,
   SchoolDto,
@@ -10,4 +18,8 @@ export type {
   AttendanceBreakdownDto,
   SubjectAverageDto,
   AnalyticsSnapshotDto,
+  MonthlyAnalyticsDto,
+  AdviceItemDto,
+  StudentAnalyticsSnapshotDto,
+  ClassSummaryDto,
 } from "./types";

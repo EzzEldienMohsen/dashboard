@@ -7,6 +7,12 @@ export default function DashboardLoading() {
         <div className="skeleton h-64 rounded-2xl" />
         <div className="skeleton h-64 rounded-2xl" />
       </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="skeleton h-64 rounded-2xl" />
+        <div className="skeleton h-64 rounded-2xl" />
+      </div>
+      <div className="skeleton h-32 rounded-2xl" />
+      <div className="skeleton h-48 rounded-2xl" />
     </div>
   );
 }

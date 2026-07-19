@@ -4,6 +4,8 @@ export interface AuthenticatedFetchOptions {
   /** Seconds to persist in Next's Data Cache. */
   revalidate: number;
   tags: string[];
+  /** Forwarded as `Accept-Language` — only needed for endpoints returning backend-localized text (e.g. student advice). */
+  locale?: string;
 }
 
 export interface AuthenticatedFetchClient {
@@ -21,12 +23,15 @@ export class NestAuthenticatedFetchClient implements AuthenticatedFetchClient {
   async get<T>(
     path: string,
     token: string,
-    { revalidate, tags }: AuthenticatedFetchOptions,
+    { revalidate, tags, locale }: AuthenticatedFetchOptions,
   ): Promise<T | null> {
     const url = `${INTERNAL_API_URL}${API_VERSION_PREFIX}${path}`;
     try {
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(locale ? { "Accept-Language": locale } : {}),
+        },
         next: { revalidate, tags },
       });
       if (res.ok) return (await res.json()) as T;

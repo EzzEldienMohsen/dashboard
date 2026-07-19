@@ -28,6 +28,13 @@ export const metadata: Metadata = {
     template: "%s | Campus Dashboard",
   },
   description: "Campus Dashboard — manage classes, students, and staff.",
+  // Root-level fallback hreflang — pages that call buildPageMetadata
+  // override this with their own path-specific languages map; this covers
+  // pages that don't (e.g. noindexed dashboard/auth routes) with at least
+  // a valid per-locale home link instead of no alternates at all.
+  alternates: {
+    languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
+  },
   openGraph: { type: "website", siteName: "Campus Dashboard" },
   twitter: { card: "summary_large_image" },
 };

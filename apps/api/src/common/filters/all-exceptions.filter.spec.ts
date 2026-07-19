@@ -113,7 +113,7 @@ describe('AllExceptionsFilter', () => {
     expect(captureExceptionMock).toHaveBeenCalledTimes(1);
     const [capturedException, hint] = captureExceptionMock.mock.calls[0];
     expect(capturedException).toBe(exception);
-    expect(hint?.extra).toBeDefined();
+    expect(hint).toMatchObject({ extra: expect.any(Object) as object });
 
     expect(jsonMock).toHaveBeenCalledWith(
       expect.objectContaining({ message: 'Internal server error' }),

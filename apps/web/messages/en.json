@@ -244,6 +244,25 @@
     },
     "loading": "Loading…"
   },
+  "analytics": {
+    "monthlyPerformanceTitle": "Monthly performance",
+    "selectMonth": "Select month",
+    "trendTitle": "Performance over time",
+    "trendGradeLabel": "Grades",
+    "trendAttendanceLabel": "Attendance",
+    "improvementRateTitle": "Improvement rate",
+    "improvementRateUp": "Improved by {value}% since last recorded month",
+    "improvementRateDown": "Declined by {value}% since last recorded month",
+    "improvementRateFlat": "No change since last recorded month",
+    "commitmentTitle": "Commitment",
+    "strengthsTitle": "Strengths",
+    "weaknessesTitle": "Areas to improve",
+    "noStrengths": "No strengths recorded yet.",
+    "noWeaknesses": "No areas need improvement right now.",
+    "adviceTitle": "Advice",
+    "noAdvice": "No advice available yet.",
+    "classesTitle": "Classes"
+  },
   "marketing": {
     "error": {
       "title": "Something went wrong",
@@ -266,6 +285,7 @@
     "columnFirstName": "First name",
     "columnLastName": "Last name",
     "columnClass": "Class",
-    "empty": "No students found."
+    "empty": "No students found.",
+    "backToList": "← Back to Students"
   }
 }

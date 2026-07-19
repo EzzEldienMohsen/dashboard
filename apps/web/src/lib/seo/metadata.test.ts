@@ -71,4 +71,33 @@ describe("buildPageMetadata", () => {
 
     expect(metadata.openGraph).toMatchObject({ type: "article" });
   });
+
+  it("builds a per-page Twitter card mirroring the title and description", () => {
+    const metadata = buildPageMetadata({
+      title: "About us",
+      description: "Learn more about us",
+      path: "/about",
+      locale: "en",
+    });
+
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      title: "About us",
+      description: "Learn more about us",
+    });
+  });
+
+  it("includes a custom Twitter image when provided", () => {
+    const metadata = buildPageMetadata({
+      title: "Announcement",
+      description: "Something happened",
+      path: "/announcements/1",
+      locale: "en",
+      twitterImage: "/announcements/1/opengraph-image",
+    });
+
+    expect(metadata.twitter).toMatchObject({
+      images: ["/announcements/1/opengraph-image"],
+    });
+  });
 });

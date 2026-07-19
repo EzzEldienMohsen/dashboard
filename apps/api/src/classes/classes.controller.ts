@@ -20,6 +20,8 @@ import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 import type { PaginatedResult } from '../common/interfaces/paginated-result.interface';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { AnalyticsResponseDto } from '../analytics/dto/analytics-response.dto';
+import { MonthlyAnalyticsResponseDto } from '../analytics/dto/monthly-analytics-response.dto';
+import { MonthlyAnalyticsQueryDto } from '../analytics/dto/monthly-analytics-query.dto';
 
 @ApiTags('classes')
 @ApiBearerAuth()
@@ -58,5 +60,19 @@ export class ClassesController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<AnalyticsResponseDto> {
     return this.analyticsService.getClassAnalytics(id, user.schoolId);
+  }
+
+  @Get(':id/analytics/monthly')
+  @Header('Cache-Control', 'private, max-age=30')
+  getMonthlyAnalytics(
+    @Param('id') id: string,
+    @Query() query: MonthlyAnalyticsQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<MonthlyAnalyticsResponseDto[]> {
+    return this.analyticsService.getClassMonthlyAnalytics(
+      id,
+      user.schoolId,
+      query.months,
+    );
   }
 }

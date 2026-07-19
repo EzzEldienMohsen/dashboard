@@ -7,7 +7,7 @@ describe('ClassesController', () => {
   let controller: ClassesController;
   let service: jest.Mocked<Pick<ClassesService, 'findMany' | 'findById'>>;
   let analyticsService: jest.Mocked<
-    Pick<AnalyticsService, 'getClassAnalytics'>
+    Pick<AnalyticsService, 'getClassAnalytics' | 'getClassMonthlyAnalytics'>
   >;
 
   const user: AuthenticatedUser = {
@@ -19,7 +19,10 @@ describe('ClassesController', () => {
 
   beforeEach(() => {
     service = { findMany: jest.fn(), findById: jest.fn() };
-    analyticsService = { getClassAnalytics: jest.fn() };
+    analyticsService = {
+      getClassAnalytics: jest.fn(),
+      getClassMonthlyAnalytics: jest.fn(),
+    };
     controller = new ClassesController(
       service as unknown as ClassesService,
       analyticsService as unknown as AnalyticsService,
@@ -53,6 +56,7 @@ describe('ClassesController', () => {
       attendanceBreakdown: { present: 9, absent: 1, late: 0, excused: 0 },
       averageGradePercentage: 85,
       gradesBySubject: [],
+      improvementRatePercentage: 0,
     };
     analyticsService.getClassAnalytics.mockResolvedValue(snapshot);
 
@@ -62,6 +66,26 @@ describe('ClassesController', () => {
     expect(analyticsService.getClassAnalytics).toHaveBeenCalledWith(
       'class-1',
       'school-1',
+    );
+  });
+
+  it('delegates getMonthlyAnalytics to the analytics service with the id, months, and caller schoolId', async () => {
+    const monthly = [
+      {
+        month: '2026-06',
+        averageGradePercentage: 80,
+        attendanceRatePercentage: 95,
+      },
+    ];
+    analyticsService.getClassMonthlyAnalytics.mockResolvedValue(monthly);
+
+    await expect(
+      controller.getMonthlyAnalytics('class-1', { months: 3 }, user),
+    ).resolves.toBe(monthly);
+    expect(analyticsService.getClassMonthlyAnalytics).toHaveBeenCalledWith(
+      'class-1',
+      'school-1',
+      3,
     );
   });
 });

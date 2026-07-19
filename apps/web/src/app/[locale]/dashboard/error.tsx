@@ -17,6 +17,12 @@ export default function DashboardError({
   const t = useTranslations("dashboard.error");
 
   useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: "route",
+      message: "dashboard-route-error-boundary-triggered",
+      level: "error",
+      data: { digest: error.digest },
+    });
     Sentry.captureException(error, { extra: { digest: error.digest } });
   }, [error]);
 

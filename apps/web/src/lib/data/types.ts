@@ -41,4 +41,32 @@ export interface AnalyticsSnapshotDto {
   attendanceBreakdown: AttendanceBreakdownDto;
   averageGradePercentage: number;
   gradesBySubject: SubjectAverageDto[];
+  improvementRatePercentage: number;
+}
+
+export interface MonthlyAnalyticsDto {
+  month: string;
+  averageGradePercentage: number;
+  attendanceRatePercentage: number;
+}
+
+export interface AdviceItemDto {
+  subject: string;
+  severity: "strength" | "weakness";
+  message: string;
+}
+
+export interface StudentAnalyticsSnapshotDto extends AnalyticsSnapshotDto {
+  strengths: SubjectAverageDto[];
+  weaknesses: SubjectAverageDto[];
+  advice: AdviceItemDto[];
+}
+
+export interface ClassSummaryDto {
+  classId: string;
+  className: string;
+  attendanceRatePercentage: number;
+  attendanceBreakdown: AttendanceBreakdownDto;
+  averageGradePercentage: number;
+  gradesBySubject: SubjectAverageDto[];
 }

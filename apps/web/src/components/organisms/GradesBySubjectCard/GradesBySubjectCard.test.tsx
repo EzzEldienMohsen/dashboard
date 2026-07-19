@@ -3,8 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { GradesBySubjectCard } from "./GradesBySubjectCard";
 import type { SubjectAverageDto } from "@/lib/data";
 
-vi.mock("next-intl/server", () => ({
-  getTranslations: vi.fn().mockResolvedValue((key: string) => key),
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
 }));
 
 vi.mock("@/components/atoms/BarChart", () => ({
@@ -20,28 +20,28 @@ vi.mock("@/components/atoms/BarChart", () => ({
 }));
 
 describe("GradesBySubjectCard", () => {
-  it("renders the title and the average grade percentage", async () => {
+  it("renders the title and the average grade percentage", () => {
     const gradesBySubject: SubjectAverageDto[] = [
       { subject: "Math", averagePercentage: 85 },
       { subject: "Science", averagePercentage: 70 },
     ];
 
     render(
-      await GradesBySubjectCard({ gradesBySubject, averageGradePercentage: 78 }),
+      <GradesBySubjectCard gradesBySubject={gradesBySubject} averageGradePercentage={78} />,
     );
 
     expect(screen.getByText("gradesBySubjectTitle")).toBeInTheDocument();
     expect(screen.getByText("78%")).toBeInTheDocument();
   });
 
-  it("passes subject labels and percentage values through to the BarChart", async () => {
+  it("passes subject labels and percentage values through to the BarChart", () => {
     const gradesBySubject: SubjectAverageDto[] = [
       { subject: "Math", averagePercentage: 85 },
       { subject: "Science", averagePercentage: 70 },
     ];
 
     render(
-      await GradesBySubjectCard({ gradesBySubject, averageGradePercentage: 78 }),
+      <GradesBySubjectCard gradesBySubject={gradesBySubject} averageGradePercentage={78} />,
     );
 
     const chart = screen.getByTestId("bar-chart");

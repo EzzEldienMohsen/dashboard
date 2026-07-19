@@ -23,6 +23,7 @@ describe('JwtStrategy', () => {
     sub: 'user-1',
     email: 'jane@example.com',
     role: 'TEACHER',
+    schoolId: 'school-1',
   };
 
   beforeEach(() => {
@@ -39,6 +40,7 @@ describe('JwtStrategy', () => {
       id: 'user-1',
       email: 'jane@example.com',
       role: 'TEACHER',
+      schoolId: 'school-1',
     };
     cache.get.mockResolvedValue(cachedUser);
 
@@ -55,6 +57,7 @@ describe('JwtStrategy', () => {
       id: 'user-1',
       email: 'jane@example.com',
       role: 'TEACHER',
+      schoolId: 'school-1',
     });
 
     const result = await strategy.validate(payload);
@@ -62,13 +65,19 @@ describe('JwtStrategy', () => {
     expect(users.findById).toHaveBeenCalledWith('user-1');
     expect(cache.set).toHaveBeenCalledWith(
       'auth:user:user-1',
-      { id: 'user-1', email: 'jane@example.com', role: 'TEACHER' },
+      {
+        id: 'user-1',
+        email: 'jane@example.com',
+        role: 'TEACHER',
+        schoolId: 'school-1',
+      },
       30_000,
     );
     expect(result).toEqual({
       id: 'user-1',
       email: 'jane@example.com',
       role: 'TEACHER',
+      schoolId: 'school-1',
     });
   });
 

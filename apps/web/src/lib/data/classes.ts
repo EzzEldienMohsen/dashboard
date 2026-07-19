@@ -9,3 +9,10 @@ export function getClasses(token: string, page: number, limit = 20) {
     { revalidate: 30, tags: ["classes"] },
   );
 }
+
+export function getClassById(token: string, classId: string) {
+  return authenticatedFetchClient.get<ClassDto>(`/classes/${classId}`, token, {
+    revalidate: 30,
+    tags: ["classes"],
+  });
+}

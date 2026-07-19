@@ -9,37 +9,114 @@ const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 const SUBJECTS = ['Math', 'Science', 'English', 'Arabic', 'History'];
-const ASSESSMENTS_PER_SUBJECT = 3;
-const ATTENDANCE_DAYS = 60;
-const STUDENTS_PER_CLASS_RANGE: [number, number] = [20, 25];
+const MONTHS_OF_HISTORY = 9;
+const STUDENTS_PER_CLASS_RANGE: [number, number] = [20, 28];
 const ANNOUNCEMENT_DATE_SPREAD_DAYS = 240;
 
-const ATTENDANCE_WEIGHTS: Array<[$Enums.AttendanceStatus, number]> = [
-  ['PRESENT', 0.85],
-  ['ABSENT', 0.08],
-  ['LATE', 0.05],
-  ['EXCUSED', 0.02],
-];
+/**
+ * Each class section is deliberately biased up or down so the school page's
+ * color-coded class links and the classes tab view show a real spread of
+ * high/low performers, instead of near-identical bars. Cycles if there are
+ * ever more class sections than entries here.
+ */
+const CLASS_PERFORMANCE_BIAS = [16, -4, 6, -18, 10, 2];
 
-function weightedAttendanceStatus(): $Enums.AttendanceStatus {
-  const roll = Math.random();
-  let cumulative = 0;
-  for (const [status, weight] of ATTENDANCE_WEIGHTS) {
-    cumulative += weight;
-    if (roll <= cumulative) return status;
-  }
-  return 'PRESENT';
+type TrendDirection = 'improving' | 'declining' | 'stable';
+const TREND_SWING = 18;
+
+/** A student's hidden generation profile — deliberately not persisted anywhere; it only drives realistic, non-uniform seed data. */
+interface StudentProfile {
+  baseSkill: number;
+  subjectAptitude: Record<string, number>;
+  trend: TrendDirection;
+  attendanceReliability: number;
 }
 
-function pastWeekdays(count: number): Date[] {
-  const dates: Date[] = [];
-  const cursor = new Date();
-  while (dates.length < count) {
-    cursor.setDate(cursor.getDate() - 1);
-    const day = cursor.getDay();
-    if (day !== 0 && day !== 6) dates.push(new Date(cursor));
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
+}
+
+/** Sum of three uniform randoms approximates a bell curve — good enough for seed variety, no real stats library needed. */
+function approxNormal(mean: number, spread: number): number {
+  const u = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+  return mean + u * spread;
+}
+
+function pickTrend(): TrendDirection {
+  const roll = Math.random();
+  if (roll < 0.3) return 'improving';
+  if (roll < 0.6) return 'declining';
+  return 'stable';
+}
+
+function buildStudentProfile(classBias: number): StudentProfile {
+  const baseSkill = clamp(72 + classBias + approxNormal(0, 13), 40, 98);
+  const subjectAptitude: Record<string, number> = {};
+  for (const subject of SUBJECTS) {
+    subjectAptitude[subject] = approxNormal(0, 12);
   }
-  return dates;
+  const attendanceReliability = clamp(
+    0.82 + classBias / 200 + approxNormal(0, 0.1),
+    0.55,
+    0.99,
+  );
+  return {
+    baseSkill,
+    subjectAptitude,
+    trend: pickTrend(),
+    attendanceReliability,
+  };
+}
+
+function trendSlope(trend: TrendDirection): number {
+  if (trend === 'improving') return 1;
+  if (trend === 'declining') return -1;
+  return 0;
+}
+
+function weightedAttendanceStatus(
+  presentProbability: number,
+): $Enums.AttendanceStatus {
+  const roll = Math.random();
+  if (roll < presentProbability) return 'PRESENT';
+  const remainder = (roll - presentProbability) / (1 - presentProbability);
+  if (remainder < 0.6) return 'ABSENT';
+  if (remainder < 0.9) return 'LATE';
+  return 'EXCUSED';
+}
+
+/** Month-start dates for the trailing `months` window, oldest to newest — mirrors the analytics module's own month bucketing so seeded data lines up with every trend/monthly-dropdown feature. */
+function monthsInTrailingWindow(months: number): Date[] {
+  const now = new Date();
+  const result: Date[] = [];
+  for (let i = months - 1; i >= 0; i--) {
+    result.push(
+      new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1)),
+    );
+  }
+  return result;
+}
+
+function randomDateWithinMonth(monthStart: Date): Date {
+  const year = monthStart.getUTCFullYear();
+  const month = monthStart.getUTCMonth();
+  const day = 1 + Math.floor(Math.random() * 27);
+  return new Date(Date.UTC(year, month, day, 12));
+}
+
+function weekdaysInTrailingMonths(months: number): Date[] {
+  const now = new Date();
+  const start = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (months - 1), 1),
+  );
+  const days: Date[] = [];
+  const cursor = new Date(start);
+  while (cursor <= now) {
+    const day = cursor.getUTCDay();
+    if (day !== 0 && day !== 6) days.push(new Date(cursor));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return days;
 }
 
 async function clearExistingData() {
@@ -441,23 +518,39 @@ async function seedSchoolHierarchy() {
   const gradeLevels = [4, 5, 6];
   const sections = ['A', 'B'];
 
-  const classes = gradeLevels.flatMap((grade) =>
-    sections.map((section) => ({
-      id: randomUUID(),
-      name: `Grade ${grade}-${section}`,
-      schoolId,
-    })),
+  const classes = gradeLevels.flatMap((grade, gradeIndex) =>
+    sections.map((section, sectionIndex) => {
+      const classIndex = gradeIndex * sections.length + sectionIndex;
+      return {
+        id: randomUUID(),
+        name: `Grade ${grade}-${section}`,
+        schoolId,
+        performanceBias:
+          CLASS_PERFORMANCE_BIAS[classIndex % CLASS_PERFORMANCE_BIAS.length],
+      };
+    }),
   );
-  await prisma.class.createMany({ data: classes });
+  await prisma.class.createMany({
+    data: classes.map(({ id, name, schoolId: classSchoolId }) => ({
+      id,
+      name,
+      schoolId: classSchoolId,
+    })),
+  });
 
-  const students: { id: string; classId: string }[] = [];
+  const students: { id: string; classId: string; profile: StudentProfile }[] =
+    [];
   for (const klass of classes) {
     const count = faker.number.int({
       min: STUDENTS_PER_CLASS_RANGE[0],
       max: STUDENTS_PER_CLASS_RANGE[1],
     });
     for (let i = 0; i < count; i++) {
-      students.push({ id: randomUUID(), classId: klass.id });
+      students.push({
+        id: randomUUID(),
+        classId: klass.id,
+        profile: buildStudentProfile(klass.performanceBias),
+      });
     }
   }
 
@@ -470,7 +563,8 @@ async function seedSchoolHierarchy() {
     })),
   });
 
-  const weekdays = pastWeekdays(ATTENDANCE_DAYS);
+  const months = monthsInTrailingWindow(MONTHS_OF_HISTORY);
+  const weekdays = weekdaysInTrailingMonths(MONTHS_OF_HISTORY);
 
   const gradeRecords: {
     studentId: string;
@@ -486,22 +580,40 @@ async function seedSchoolHierarchy() {
   }[] = [];
 
   for (const student of students) {
-    for (const subject of SUBJECTS) {
-      for (let a = 0; a < ASSESSMENTS_PER_SUBJECT; a++) {
+    const { profile } = student;
+    const slope = trendSlope(profile.trend);
+
+    months.forEach((monthStart, monthIndex) => {
+      const progress =
+        MONTHS_OF_HISTORY > 1 ? monthIndex / (MONTHS_OF_HISTORY - 1) : 0;
+      const trendDelta = slope * progress * TREND_SWING;
+
+      for (const subject of SUBJECTS) {
+        const score = clamp(
+          Math.round(
+            profile.baseSkill +
+              profile.subjectAptitude[subject] +
+              trendDelta +
+              approxNormal(0, 6),
+          ),
+          40,
+          100,
+        );
         gradeRecords.push({
           studentId: student.id,
           subject,
-          score: faker.number.int({ min: 55, max: 100 }),
+          score,
           maxScore: 100,
-          recordedAt: faker.date.recent({ days: 90 }),
+          recordedAt: randomDateWithinMonth(monthStart),
         });
       }
-    }
+    });
+
     for (const date of weekdays) {
       attendanceRecords.push({
         studentId: student.id,
         date,
-        status: weightedAttendanceStatus(),
+        status: weightedAttendanceStatus(profile.attendanceReliability),
       });
     }
   }

@@ -1,0 +1,6 @@
+{
+  "strength": "Excelling in {subject} — averaging {percentage}%. Keep up the great work and consider stretch material to stay challenged.",
+  "relativeStrength": "{subject} is relatively the strongest subject at {percentage}%, though there's still room to grow across the board.",
+  "weakness": "Needs improvement in {subject} — currently at {percentage}%. Extra practice sessions and reviewing recent material should help close the gap.",
+  "weaknessSevere": "Struggling in {subject} — currently at {percentage}%. This subject needs urgent attention; consider a tutor or one-on-one review with the teacher."
+}

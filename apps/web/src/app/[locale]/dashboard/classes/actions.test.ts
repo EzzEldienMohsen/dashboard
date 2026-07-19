@@ -1,58 +1,84 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getClasses } from "@/lib/data";
+import { getClassAnalytics, getClassMonthlyAnalytics } from "@/lib/data";
 import type { CurrentUser } from "@/lib/auth/session";
-import type { ClassDto, PaginatedResult } from "@/lib/data";
+import type { AnalyticsSnapshotDto, MonthlyAnalyticsDto } from "@/lib/data";
 
 vi.mock("@/lib/auth/session", () => ({
   getCurrentUser: vi.fn(),
 }));
 
 vi.mock("@/lib/data", () => ({
-  getClasses: vi.fn(),
+  getClassAnalytics: vi.fn(),
+  getClassMonthlyAnalytics: vi.fn(),
 }));
 
 const mockedGetCurrentUser = vi.mocked(getCurrentUser);
-const mockedGetClasses = vi.mocked(getClasses);
+const mockedGetClassAnalytics = vi.mocked(getClassAnalytics);
+const mockedGetClassMonthlyAnalytics = vi.mocked(getClassMonthlyAnalytics);
 
 const USER: CurrentUser = {
   id: "user-1",
-  email: "manager@school.dev",
-  role: "MANAGER",
+  email: "teacher@school.dev",
+  role: "TEACHER",
   schoolId: "school-1",
   accessToken: "token-1",
 };
 
-describe("fetchClassesAction", () => {
-  beforeEach(() => {
-    mockedGetCurrentUser.mockReset();
-    mockedGetClasses.mockReset();
-  });
+beforeEach(() => {
+  mockedGetCurrentUser.mockReset();
+  mockedGetClassAnalytics.mockReset();
+  mockedGetClassMonthlyAnalytics.mockReset();
+});
 
-  it("returns null and does not call getClasses when there is no current user", async () => {
+describe("fetchClassAnalyticsAction", () => {
+  it("returns null and does not call getClassAnalytics when there is no current user", async () => {
     mockedGetCurrentUser.mockResolvedValue(null);
-    const { fetchClassesAction } = await import("./actions");
+    const { fetchClassAnalyticsAction } = await import("./actions");
 
-    const result = await fetchClassesAction(1);
-
-    expect(result).toBeNull();
-    expect(mockedGetClasses).not.toHaveBeenCalled();
+    expect(await fetchClassAnalyticsAction("class-1")).toBeNull();
+    expect(mockedGetClassAnalytics).not.toHaveBeenCalled();
   });
 
-  it("delegates to getClasses with the user's access token and the requested page", async () => {
+  it("delegates to getClassAnalytics with the user's access token and classId", async () => {
     mockedGetCurrentUser.mockResolvedValue(USER);
-    const page: PaginatedResult<ClassDto> = {
-      items: [{ id: "c1", name: "Class 1", schoolId: "school-1" }],
-      total: 1,
-      page: 1,
-      limit: 20,
+    const analytics: AnalyticsSnapshotDto = {
+      attendanceRatePercentage: 90,
+      attendanceBreakdown: { present: 9, absent: 1, late: 0, excused: 0 },
+      averageGradePercentage: 85,
+      gradesBySubject: [],
+      improvementRatePercentage: 2,
     };
-    mockedGetClasses.mockResolvedValue(page);
-    const { fetchClassesAction } = await import("./actions");
+    mockedGetClassAnalytics.mockResolvedValue(analytics);
+    const { fetchClassAnalyticsAction } = await import("./actions");
 
-    const result = await fetchClassesAction(1);
+    const result = await fetchClassAnalyticsAction("class-1");
 
-    expect(mockedGetClasses).toHaveBeenCalledWith("token-1", 1);
-    expect(result).toEqual(page);
+    expect(mockedGetClassAnalytics).toHaveBeenCalledWith("token-1", "class-1");
+    expect(result).toEqual(analytics);
+  });
+});
+
+describe("fetchClassMonthlyAnalyticsAction", () => {
+  it("returns null when there is no current user", async () => {
+    mockedGetCurrentUser.mockResolvedValue(null);
+    const { fetchClassMonthlyAnalyticsAction } = await import("./actions");
+
+    expect(await fetchClassMonthlyAnalyticsAction("class-1")).toBeNull();
+    expect(mockedGetClassMonthlyAnalytics).not.toHaveBeenCalled();
+  });
+
+  it("delegates to getClassMonthlyAnalytics with the user's access token and classId", async () => {
+    mockedGetCurrentUser.mockResolvedValue(USER);
+    const monthly: MonthlyAnalyticsDto[] = [
+      { month: "2026-06", averageGradePercentage: 80, attendanceRatePercentage: 90 },
+    ];
+    mockedGetClassMonthlyAnalytics.mockResolvedValue(monthly);
+    const { fetchClassMonthlyAnalyticsAction } = await import("./actions");
+
+    const result = await fetchClassMonthlyAnalyticsAction("class-1");
+
+    expect(mockedGetClassMonthlyAnalytics).toHaveBeenCalledWith("token-1", "class-1");
+    expect(result).toEqual(monthly);
   });
 });

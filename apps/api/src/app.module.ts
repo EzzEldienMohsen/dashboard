@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
@@ -5,6 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { LoggerModule } from 'nestjs-pino';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { validateEnv } from './common/config/env.validation';
@@ -53,6 +55,16 @@ function buildCacheStores(): KeyvRedis<unknown>[] | undefined {
       },
     }),
     ThrottlerModule.forRoot([{ ttl: THROTTLE_TTL_MS, limit: THROTTLE_LIMIT }]),
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        // nest-cli's asset copier places `src/i18n/**` at `<outDir>/i18n`,
+        // not `<outDir>/src/i18n` — one level above this compiled module.
+        path: join(__dirname, '..', 'i18n'),
+        watch: true,
+      },
+      resolvers: [new AcceptLanguageResolver()],
+    }),
     CacheModule.register({
       isGlobal: true,
       ttl: READ_CACHE_TTL_MS,

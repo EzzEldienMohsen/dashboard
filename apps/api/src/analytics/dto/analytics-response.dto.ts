@@ -24,6 +24,7 @@ export class AnalyticsResponseDto {
   @Expose()
   @Type(() => SubjectAverageDto)
   gradesBySubject!: SubjectAverageDto[];
+  @Expose() improvementRatePercentage!: number;
 
   static fromEntity(entity: Record<string, unknown>): AnalyticsResponseDto {
     return plainToInstance(AnalyticsResponseDto, entity, {

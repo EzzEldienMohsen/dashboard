@@ -1,4 +1,5 @@
 import type { Logger } from '@nestjs/common';
+import * as Sentry from '@sentry/nestjs';
 import type { AppException } from '../exceptions/app.exception';
 
 export async function withServiceError<T>(
@@ -16,6 +17,14 @@ export async function withServiceError<T>(
     errorContext: Record<string, unknown>;
   },
 ): Promise<T> {
+  const message =
+    typeof errorContext.msg === 'string' ? errorContext.msg : 'service call';
+  Sentry.addBreadcrumb({
+    category: 'service',
+    message,
+    level: 'info',
+    data: errorContext,
+  });
   try {
     return await fn();
   } catch (err: unknown) {

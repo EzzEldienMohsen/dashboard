@@ -14,6 +14,7 @@ describe('SchoolsService', () => {
     findById: jest.fn(),
     findMany: jest.fn(),
     existsById: jest.fn(),
+    resolveDefaultSchoolId: jest.fn(),
   };
 
   const existingSchool = {

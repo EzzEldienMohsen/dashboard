@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getStudents } from "./students";
+import { getStudentById, getStudents } from "./students";
 import { authenticatedFetchClient } from "@/lib/api/authenticated-fetcher";
 import type { PaginatedResult, StudentDto } from "./types";
 
@@ -49,6 +49,30 @@ describe("getStudents", () => {
     await getStudents("tok", 1, 20, "c1");
 
     expect(getMock).toHaveBeenCalledWith("/students?page=1&limit=20&classId=c1", "tok", {
+      revalidate: 30,
+      tags: ["students"],
+    });
+  });
+});
+
+describe("getStudentById", () => {
+  beforeEach(() => {
+    getMock.mockReset();
+  });
+
+  it("requests the student by id with the correct token, revalidate and tags", async () => {
+    const student: StudentDto = {
+      id: "st1",
+      firstName: "Ada",
+      lastName: "Lovelace",
+      classId: "c1",
+    };
+    getMock.mockResolvedValue(student);
+
+    const result = await getStudentById("tok", "st1");
+
+    expect(result).toEqual(student);
+    expect(getMock).toHaveBeenCalledWith("/students/st1", "tok", {
       revalidate: 30,
       tags: ["students"],
     });

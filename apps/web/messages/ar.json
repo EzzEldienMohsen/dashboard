@@ -244,6 +244,25 @@
     },
     "loading": "جارٍ التحميل…"
   },
+  "analytics": {
+    "monthlyPerformanceTitle": "الأداء الشهري",
+    "selectMonth": "اختر الشهر",
+    "trendTitle": "الأداء عبر الوقت",
+    "trendGradeLabel": "الدرجات",
+    "trendAttendanceLabel": "الحضور",
+    "improvementRateTitle": "معدل التحسن",
+    "improvementRateUp": "تحسّن بنسبة {value}% منذ آخر شهر مسجَّل",
+    "improvementRateDown": "انخفض بنسبة {value}% منذ آخر شهر مسجَّل",
+    "improvementRateFlat": "لا تغيير منذ آخر شهر مسجَّل",
+    "commitmentTitle": "الالتزام",
+    "strengthsTitle": "نقاط القوة",
+    "weaknessesTitle": "مجالات تحتاج إلى تحسين",
+    "noStrengths": "لا توجد نقاط قوة مسجَّلة بعد.",
+    "noWeaknesses": "لا توجد مجالات تحتاج إلى تحسين حاليًا.",
+    "adviceTitle": "النصائح",
+    "noAdvice": "لا توجد نصائح متاحة بعد.",
+    "classesTitle": "الفصول"
+  },
   "marketing": {
     "error": {
       "title": "حدث خطأ ما",
@@ -266,6 +285,7 @@
     "columnFirstName": "الاسم الأول",
     "columnLastName": "اسم العائلة",
     "columnClass": "الفصل",
-    "empty": "لم يتم العثور على طلاب."
+    "empty": "لم يتم العثور على طلاب.",
+    "backToList": "← العودة إلى الطلاب"
   }
 }

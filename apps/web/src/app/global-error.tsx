@@ -11,6 +11,12 @@ export default function GlobalError({
   unstable_retry: () => void;
 }) {
   useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: "route",
+      message: "global-error-boundary-triggered",
+      level: "error",
+      data: { digest: error.digest },
+    });
     Sentry.captureException(error);
   }, [error]);
 

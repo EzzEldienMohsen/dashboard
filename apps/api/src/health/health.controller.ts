@@ -6,6 +6,7 @@ import {
   type HealthCheckResult,
 } from '@nestjs/terminus';
 import { PrismaService } from '../prisma/prisma.service';
+import { CacheHealthIndicator } from './cache-health.indicator';
 
 // Public liveness/readiness probe for orchestrators — no auth/role guards by design.
 @Controller('health')
@@ -14,6 +15,7 @@ export class HealthController {
     private readonly health: HealthCheckService,
     private readonly prismaIndicator: PrismaHealthIndicator,
     private readonly prisma: PrismaService,
+    private readonly cacheIndicator: CacheHealthIndicator,
   ) {}
 
   // Version-neutral: monitoring/orchestrators expect a stable /health path, not /v1/health.
@@ -25,6 +27,7 @@ export class HealthController {
   check(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaIndicator.pingCheck('database', this.prisma),
+      () => this.cacheIndicator.isHealthy('cache'),
     ]);
   }
 }

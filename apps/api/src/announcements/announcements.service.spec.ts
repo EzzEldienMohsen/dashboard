@@ -13,6 +13,7 @@ describe('AnnouncementsService', () => {
   const announcements: jest.Mocked<IAnnouncementRepository> = {
     findById: jest.fn(),
     findMany: jest.fn(),
+    findManyCursor: jest.fn(),
   };
 
   const existingAnnouncement = {

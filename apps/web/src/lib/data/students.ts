@@ -15,3 +15,11 @@ export function getStudents(
     { revalidate: 30, tags: ["students"] },
   );
 }
+
+export function getStudentById(token: string, studentId: string) {
+  return authenticatedFetchClient.get<StudentDto>(
+    `/students/${studentId}`,
+    token,
+    { revalidate: 30, tags: ["students"] },
+  );
+}

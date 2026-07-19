@@ -48,6 +48,7 @@ export default defineConfig({
         // next/dynamic wrappers — pure framework wiring, no branching logic.
         "src/components/atoms/BarChart/LazyBarChart.tsx",
         "src/components/atoms/DoughnutChart/LazyDoughnutChart.tsx",
+        "src/components/atoms/LineChart/LazyLineChart.tsx",
         // Barrel re-exports and type-only files — no logic to test.
         "src/**/index.ts",
         "src/lib/api/types.ts",

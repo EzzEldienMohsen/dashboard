@@ -19,8 +19,14 @@ async function bootstrap() {
   app.use(helmet());
   app.use(compression());
   app.use(cookieParser());
+  // Falling back to `true` (reflect any Origin) combined with credentials
+  // would allow any site to make authenticated requests if CORS_ORIGIN is
+  // ever left unset in production — permissive in dev for convenience,
+  // fail closed (deny all cross-origin) in production instead.
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : true,
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : process.env.NODE_ENV !== 'production',
     credentials: true,
   });
   app.enableVersioning({
