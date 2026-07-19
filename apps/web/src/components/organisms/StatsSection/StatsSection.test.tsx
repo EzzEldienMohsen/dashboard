@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { StatsSection } from "./StatsSection";
 
@@ -13,6 +13,45 @@ vi.mock("@/lib/api", () => ({
     teachersCount: 210,
   }),
 }));
+
+// StaggerContainer's `whileInView` and AnimatedCounter's `useInView` both rely
+// on IntersectionObserver — report every observed element as intersecting
+// immediately so the animated counters resolve to their target values.
+beforeAll(() => {
+  class MockIntersectionObserver implements IntersectionObserver {
+    readonly root: Element | Document | null = null;
+    readonly rootMargin: string = "";
+    readonly thresholds: ReadonlyArray<number> = [];
+    constructor(private callback: IntersectionObserverCallback) {}
+    observe(target: Element) {
+      this.callback(
+        [{ isIntersecting: true, target } as IntersectionObserverEntry],
+        this,
+      );
+    }
+    unobserve() {}
+    disconnect() {}
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+  }
+  window.IntersectionObserver =
+    MockIntersectionObserver as unknown as typeof IntersectionObserver;
+});
+
+beforeEach(() => {
+  // Resolve AnimatedCounter's rAF loop in a single synchronous frame by
+  // reporting a timestamp far past its animation duration.
+  vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
+    cb(1_000_000);
+    return 0;
+  });
+  vi.stubGlobal("cancelAnimationFrame", () => {});
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("StatsSection", () => {
   it("renders a StatCard for schools, students, and teachers with the fetched counts", async () => {

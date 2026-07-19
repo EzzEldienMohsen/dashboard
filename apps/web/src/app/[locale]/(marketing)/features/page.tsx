@@ -5,6 +5,7 @@ import { MarketingPageTemplate } from "@/components/templates/MarketingPageTempl
 import { FeatureCardGrid } from "@/components/organisms/FeatureCardGrid";
 import { HowItWorksSection } from "@/components/organisms/HowItWorksSection";
 import { CTAStrip } from "@/components/organisms/CTAStrip";
+import { FadeInSection } from "@/components/atoms/FadeInSection";
 import { getSchoolProfile } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { JsonLd } from "@/lib/seo/JsonLd";
@@ -40,24 +41,32 @@ export default async function FeaturesPage() {
       <JsonLd data={jsonLd} />
       <MarketingPageTemplate
         hero={
-          <section className="py-20 md:py-32 text-center">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-base-content leading-tight mb-6">
-              {t("hero.heading")}
-            </h1>
-            <p className="text-lg text-base-content/60 max-w-2xl mx-auto leading-relaxed">
-              {t("hero.sub")}
-            </p>
-          </section>
+          <FadeInSection delay={0}>
+            <section className="py-20 md:py-32 text-center">
+              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-base-content leading-tight mb-6">
+                {t("hero.heading")}
+              </h1>
+              <p className="text-lg text-base-content/60 max-w-2xl mx-auto leading-relaxed">
+                {t("hero.sub")}
+              </p>
+            </section>
+          </FadeInSection>
         }
       >
         <Suspense fallback={<GridSkeleton />}>
-          <FeatureCardGrid variant="full" />
+          <FadeInSection delay={0.1}>
+            <FeatureCardGrid variant="full" />
+          </FadeInSection>
         </Suspense>
         <Suspense fallback={<div className="skeleton h-48 rounded-2xl" />}>
-          <HowItWorksSection />
+          <FadeInSection delay={0.2}>
+            <HowItWorksSection />
+          </FadeInSection>
         </Suspense>
         <Suspense fallback={<div className="skeleton h-48 rounded-2xl" />}>
-          <CTAStrip heading={t("cta.heading")} buttonLabel={t("cta.button")} />
+          <FadeInSection delay={0.3}>
+            <CTAStrip heading={t("cta.heading")} buttonLabel={t("cta.button")} />
+          </FadeInSection>
         </Suspense>
       </MarketingPageTemplate>
     </>

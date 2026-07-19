@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { FeatureCardGridMotion } from "./FeatureCardGridMotion";
 
 interface FeatureCardGridProps {
   variant: "compact" | "full";
@@ -25,20 +26,7 @@ export async function FeatureCardGrid({ variant }: FeatureCardGridProps) {
   return (
     <section className="py-16">
       <h2 className="text-2xl font-bold text-base-content mb-8">{t("heading")}</h2>
-      <div className={`grid gap-6 ${gridClass}`}>
-        {items.map((item) => (
-          <div
-            key={item.title}
-            className="rounded-2xl border border-base-300 bg-base-100 p-6 flex flex-col gap-3 hover:shadow-md transition-shadow"
-          >
-            <span className="text-3xl" aria-hidden="true">
-              {item.icon}
-            </span>
-            <h3 className="font-semibold text-base-content">{item.title}</h3>
-            <p className="text-sm text-base-content/60 leading-relaxed">{item.desc}</p>
-          </div>
-        ))}
-      </div>
+      <FeatureCardGridMotion items={items} gridClass={gridClass} />
     </section>
   );
 }

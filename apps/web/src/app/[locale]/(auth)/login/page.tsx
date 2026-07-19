@@ -28,7 +28,7 @@ export default async function LoginPage() {
     url: `${SITE_URL}/login`,
     isPartOf: {
       "@type": "WebSite",
-      name: "School Dashboard",
+      name: "Campus Dashboard",
       url: SITE_URL,
     },
   };

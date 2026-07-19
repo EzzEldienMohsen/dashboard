@@ -25,4 +25,6 @@ export interface ISchoolRepository {
   ): Promise<PaginatedResult<SchoolEntity>>;
   /** Unscoped by design — used only to validate a schoolId at registration time. */
   existsById(id: string): Promise<boolean>;
+  /** Resolves the sole School row for auto-assignment at registration time (single-school deployment). Returns null if none exists. */
+  resolveDefaultSchoolId(): Promise<string | null>;
 }

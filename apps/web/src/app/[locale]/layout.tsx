@@ -24,11 +24,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "School Dashboard",
-    template: "%s | School Dashboard",
+    default: "Campus Dashboard",
+    template: "%s | Campus Dashboard",
   },
-  description: "School Dashboard — manage classes, students, and staff.",
-  openGraph: { type: "website", siteName: "School Dashboard" },
+  description: "Campus Dashboard — manage classes, students, and staff.",
+  openGraph: { type: "website", siteName: "Campus Dashboard" },
   twitter: { card: "summary_large_image" },
 };
 

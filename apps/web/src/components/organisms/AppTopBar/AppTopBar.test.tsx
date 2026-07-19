@@ -37,7 +37,7 @@ describe("AppTopBar", () => {
 
     render(await AppTopBar({ userEmail: "a@b.com", role: "MANAGER", logoutAction }));
 
-    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "switchTo" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "switchToDark" })).toBeInTheDocument();
   });
 

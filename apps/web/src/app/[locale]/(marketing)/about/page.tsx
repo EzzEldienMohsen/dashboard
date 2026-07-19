@@ -3,7 +3,9 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { MarketingPageTemplate } from "@/components/templates/MarketingPageTemplate";
 import { SchoolProfileSection } from "@/components/organisms/SchoolProfileSection";
+import { CreatorSection } from "@/components/organisms/CreatorSection";
 import { CTAStrip } from "@/components/organisms/CTAStrip";
+import { FadeInSection } from "@/components/atoms/FadeInSection";
 import { getSchoolProfile } from "@/lib/api";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { JsonLd } from "@/lib/seo/JsonLd";
@@ -52,21 +54,30 @@ export default async function AboutPage() {
       <JsonLd data={jsonLd} />
       <MarketingPageTemplate
         hero={
-          <section className="py-20 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-base-content">
-              {t("hero.heading", { schoolName: profile.name })}
-            </h1>
-          </section>
+          <FadeInSection delay={0}>
+            <section className="py-20 text-center">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-base-content">
+                {t("hero.heading", { schoolName: profile.name })}
+              </h1>
+            </section>
+          </FadeInSection>
         }
       >
         <Suspense fallback={<div className="skeleton h-64 rounded-2xl" />}>
-          <SchoolProfileSection profile={profile} />
+          <FadeInSection delay={0.1}>
+            <SchoolProfileSection profile={profile} />
+          </FadeInSection>
+        </Suspense>
+        <Suspense fallback={null}>
+          <CreatorSection />
         </Suspense>
         <Suspense fallback={<div className="skeleton h-48 rounded-2xl" />}>
-          <CTAStrip
-            heading={t("cta.heading", { schoolName: profile.name })}
-            buttonLabel={t("cta.button")}
-          />
+          <FadeInSection delay={0.2}>
+            <CTAStrip
+              heading={t("cta.heading", { schoolName: profile.name })}
+              buttonLabel={t("cta.button")}
+            />
+          </FadeInSection>
         </Suspense>
       </MarketingPageTemplate>
     </>

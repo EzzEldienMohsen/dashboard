@@ -12,7 +12,7 @@ const SUBJECTS = ['Math', 'Science', 'English', 'Arabic', 'History'];
 const ASSESSMENTS_PER_SUBJECT = 3;
 const ATTENDANCE_DAYS = 60;
 const STUDENTS_PER_CLASS_RANGE: [number, number] = [20, 25];
-const ANNOUNCEMENT_COUNT = 20;
+const ANNOUNCEMENT_DATE_SPREAD_DAYS = 240;
 
 const ATTENDANCE_WEIGHTS: Array<[$Enums.AttendanceStatus, number]> = [
   ['PRESENT', 0.85],
@@ -50,6 +50,7 @@ async function clearExistingData() {
   await prisma.school.deleteMany();
   await prisma.announcement.deleteMany();
   await prisma.schoolProfile.deleteMany();
+  await prisma.creator.deleteMany();
   await prisma.user.deleteMany();
 }
 
@@ -67,6 +68,32 @@ async function seedSchoolProfile() {
   });
 }
 
+async function seedCreator() {
+  await prisma.creator.create({
+    data: {
+      name: 'Ezz Eldien Deghedy',
+      role: 'Creator & Full-Stack Developer',
+      bio: "Frontend-focused developer specializing in Next.js, React, and TypeScript, with full MERN and NestJS/Prisma full-stack range. Built this application's entire frontend and backend — from pixel-perfect, accessible UI to a NestJS/Prisma API layer — applying SOLID principles and modern rendering strategies throughout.",
+      skills: [
+        'React.js',
+        'Next.js',
+        'TypeScript',
+        'Tailwind CSS',
+        'NestJS',
+        'Prisma',
+        'PostgreSQL',
+        'Redux Toolkit',
+        'GraphQL',
+        'Docker',
+      ],
+      email: 'ezzmohsend@gmail.com',
+      githubUrl: 'https://github.com/EzzEldienMohsen',
+      linkedinUrl: 'https://linkedin.com/in/ezz-eldeen-deghedy-a615321b6',
+      portfolioUrl: 'https://ezz-portfolio.vercel.app',
+    },
+  });
+}
+
 async function seedAnnouncements() {
   const categories = Object.values($Enums.AnnouncementCategory);
   const titlesByCategory: Record<string, string[]> = {
@@ -75,30 +102,70 @@ async function seedAnnouncements() {
       'New cafeteria menu now available',
       "School newsletter — this month's highlights",
       'Uniform policy reminder for winter term',
+      'New textbook list published for next term',
+      'Parent-teacher portal gets a fresh update',
+      'Bus route changes effective next Monday',
+      'Library digitization project now complete',
+      'Lost and found items to be donated next week',
+      'New student ambassadors program launching',
+      'Cafeteria introduces weekly vegetarian day',
+      'School supply drive for local shelters',
     ],
     EVENT: [
       'Annual Science Fair — save the date',
       'Inter-school football tournament kicks off',
       'Spring concert rehearsals begin next week',
       'Career day guest speakers announced',
+      'Annual book fair opens in the main hall',
+      'Alumni reunion weekend details released',
+      'Talent show auditions open to all grades',
+      'Graduation ceremony rehearsal schedule posted',
+      'Robotics club demo day open to parents',
+      'International culture week kicks off Monday',
+      'Art exhibition featuring student work this Friday',
+      'Chess club regional tournament sign-ups open',
     ],
     EXAM: [
       'Mid-term exam schedule released',
       'Final exam seating arrangements posted',
       'Make-up exam registration now open',
       'Exam hall guidelines for students',
+      'Updated resit policy for the spring term',
+      'Online mock exams available this weekend',
+      'Results publication date confirmed',
+      'Exam stress workshop for graduating students',
+      'Calculator policy reminder for math finals',
+      'Extra revision sessions added before finals',
+      'Exam accommodation requests due this Friday',
+      'Practice papers now available in the portal',
     ],
     HOLIDAY: [
       'School closed for national holiday',
       'Winter break schedule confirmed',
       'Half-day dismissal ahead of long weekend',
       'Holiday homework packets available online',
+      'Religious holiday observance — campus closed',
+      'Teacher in-service day — no classes',
+      'Spring break dates confirmed for all grades',
+      'National Day closure notice',
+      'Eid holiday schedule and makeup days',
+      'Optional holiday enrichment camp registration open',
+      'Long weekend transport schedule change',
+      'End-of-term holiday assembly details',
     ],
     URGENT: [
       'Early dismissal today due to weather',
       'Temporary road closure affects pickup/drop-off',
       'Immediate action needed: contact info update',
       'Health advisory from the school nurse',
+      'Scheduled power outage affecting afternoon classes',
+      'Lockdown drill scheduled for this Thursday',
+      'Allergy alert: please review the updated list',
+      'Local transport strike may affect commute times',
+      'Seasonal flu advisory from the school clinic',
+      'Temporary Wi-Fi outage in the science building',
+      'Reminder: update emergency contact details today',
+      'Road works near the main gate this week',
     ],
   };
 
@@ -108,13 +175,11 @@ async function seedAnnouncements() {
       title,
       body: faker.lorem.paragraphs({ min: 1, max: 2 }),
       category,
-      publishedAt: faker.date.recent({ days: 60 }),
+      publishedAt: faker.date.recent({ days: ANNOUNCEMENT_DATE_SPREAD_DAYS }),
     })),
   );
 
-  await prisma.announcement.createMany({
-    data: rows.slice(0, ANNOUNCEMENT_COUNT),
-  });
+  await prisma.announcement.createMany({ data: rows });
 }
 
 async function seedUsers(schoolId: string) {
@@ -236,6 +301,7 @@ async function seedSchoolHierarchy() {
 async function main() {
   await clearExistingData();
   await seedSchoolProfile();
+  await seedCreator();
   await seedAnnouncements();
   const { schoolId, classCount, studentCount } = await seedSchoolHierarchy();
   await seedUsers(schoolId);

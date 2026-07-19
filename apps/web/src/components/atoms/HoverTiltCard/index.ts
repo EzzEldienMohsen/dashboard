@@ -1,0 +1,1 @@
+export { HoverTiltCard } from "./HoverTiltCard";

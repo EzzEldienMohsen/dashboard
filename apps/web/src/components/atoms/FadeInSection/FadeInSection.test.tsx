@@ -1,26 +1,8 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { FadeInSection } from "./FadeInSection";
 
-// jsdom doesn't implement IntersectionObserver; framer-motion's
-// `whileInView` viewport tracking requires it to be present to mount.
-beforeAll(() => {
-  if (typeof window !== "undefined" && !window.IntersectionObserver) {
-    class MockIntersectionObserver implements IntersectionObserver {
-      readonly root: Element | Document | null = null;
-      readonly rootMargin: string = "";
-      readonly thresholds: ReadonlyArray<number> = [];
-      observe() {}
-      unobserve() {}
-      disconnect() {}
-      takeRecords(): IntersectionObserverEntry[] {
-        return [];
-      }
-    }
-    window.IntersectionObserver =
-      MockIntersectionObserver;
-  }
-});
+// IntersectionObserver is polyfilled globally in vitest.setup.ts.
 
 describe("FadeInSection", () => {
   it("renders its children", () => {

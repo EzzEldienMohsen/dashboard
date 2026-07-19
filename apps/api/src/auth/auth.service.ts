@@ -10,7 +10,7 @@ import {
 } from '../schools/interfaces/school-repository.interface';
 import { EmailAlreadyExistsException } from '../common/exceptions/email-already-exists.exception';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
-import { SchoolNotFoundException } from '../common/exceptions/school-not-found.exception';
+import { SchoolNotConfiguredException } from '../common/exceptions/school-not-configured.exception';
 import { withServiceError } from '../common/utils/service-error';
 import { EventQueueService } from '../queues/event-queue.service';
 import {
@@ -64,9 +64,9 @@ export class AuthService {
           throw new EmailAlreadyExistsException(dto.email);
         }
 
-        const schoolExists = await this.schools.existsById(dto.schoolId);
-        if (!schoolExists) {
-          throw new SchoolNotFoundException(dto.schoolId);
+        const schoolId = await this.schools.resolveDefaultSchoolId();
+        if (!schoolId) {
+          throw new SchoolNotConfiguredException();
         }
 
         const passwordHash = await this.hasher.hash(dto.password);
@@ -77,14 +77,14 @@ export class AuthService {
           name: dto.name,
           phone: dto.phone,
           country: dto.country,
-          schoolId: dto.schoolId,
+          schoolId,
         });
 
         const accessToken = this.tokens.sign({
           sub: user.id,
           email: user.email,
           role: user.role,
-          schoolId: dto.schoolId,
+          schoolId,
         });
         this.logger.log({
           msg: 'user registered',

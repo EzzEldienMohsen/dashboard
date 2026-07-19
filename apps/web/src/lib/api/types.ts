@@ -29,3 +29,16 @@ export interface PublicStats {
   studentsCount: number;
   teachersCount: number;
 }
+
+export interface Creator {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  skills: string[];
+  email: string | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
+  portfolioUrl: string | null;
+  updatedAt: string;
+}

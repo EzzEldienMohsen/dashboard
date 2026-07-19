@@ -5,7 +5,7 @@
       "switchToDark": "Switch to dark theme"
     },
     "language": {
-      "label": "Language"
+      "switchTo": "Switch to {locale}"
     }
   },
   "nav": {
@@ -28,7 +28,7 @@
     "contact": "Contact"
   },
   "home": {
-    "metaTitle": "{schoolName} — School Dashboard",
+    "metaTitle": "{schoolName} — Campus Dashboard",
     "metaDescription": "Manage your school's classes, students, and staff with a modern, all-in-one dashboard.",
     "hero": {
       "ctaStart": "Get Started",
@@ -91,6 +91,14 @@
       "phone": "Contact Phone",
       "mission": "Our Mission"
     },
+    "creator": {
+      "heading": "Built by",
+      "skillsHeading": "Skills",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "portfolio": "Portfolio",
+      "email": "Email"
+    },
     "cta": {
       "heading": "Join {schoolName} today.",
       "button": "Create Free Account"
@@ -126,7 +134,7 @@
   "auth": {
     "login": {
       "metaTitle": "Log In",
-      "metaDescription": "Log in to your School Dashboard account.",
+      "metaDescription": "Log in to your Campus Dashboard account.",
       "title": "Welcome back",
       "subtitle": "Log in to manage your school dashboard.",
       "emailLabel": "Email",
@@ -138,7 +146,7 @@
     },
     "register": {
       "metaTitle": "Create an Account",
-      "metaDescription": "Create a School Dashboard account as a manager or teacher.",
+      "metaDescription": "Create a Campus Dashboard account as a manager or teacher.",
       "title": "Create your account",
       "subtitle": "Set up access as a manager or teacher.",
       "loadingCountries": "Loading countries…",

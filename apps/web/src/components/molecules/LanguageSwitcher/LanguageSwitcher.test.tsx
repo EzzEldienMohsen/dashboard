@@ -11,7 +11,8 @@ vi.mock("@/i18n/navigation", () => ({
 
 vi.mock("next-intl", () => ({
   useLocale: () => "en",
-  useTranslations: () => (key: string) => key,
+  useTranslations: () => (key: string, values?: Record<string, unknown>) =>
+    values ? `${key}:${JSON.stringify(values)}` : key,
 }));
 
 afterEach(() => {
@@ -19,25 +20,26 @@ afterEach(() => {
 });
 
 describe("LanguageSwitcher", () => {
-  it("renders the active locale as the selected option", () => {
+  it("renders a single icon button, not a select", () => {
     render(<LanguageSwitcher />);
 
-    expect(screen.getByRole("combobox")).toHaveValue("en");
+    expect(screen.getByRole("button")).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
-  it("navigates to the same pathname under the new locale when a different locale is picked", () => {
+  it("labels the button with the locale it will switch to", () => {
     render(<LanguageSwitcher />);
 
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "ar" } });
+    expect(screen.getByRole("button")).toHaveAccessibleName(
+      'switchTo:{"locale":"العربية"}',
+    );
+  });
+
+  it("navigates to the same pathname under the other locale when clicked", () => {
+    render(<LanguageSwitcher />);
+
+    fireEvent.click(screen.getByRole("button"));
 
     expect(replace).toHaveBeenCalledWith("/about", { locale: "ar" });
-  });
-
-  it("does not navigate when re-selecting the already-active locale", () => {
-    render(<LanguageSwitcher />);
-
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "en" } });
-
-    expect(replace).not.toHaveBeenCalled();
   });
 });

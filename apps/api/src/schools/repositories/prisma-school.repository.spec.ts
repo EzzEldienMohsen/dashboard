@@ -5,6 +5,7 @@ describe('PrismaSchoolRepository', () => {
   const school = {
     findUnique: jest.fn(),
     findMany: jest.fn(),
+    findFirst: jest.fn(),
     count: jest.fn(),
   };
   const prisma = { school } as unknown as PrismaService;
@@ -101,6 +102,27 @@ describe('PrismaSchoolRepository', () => {
       const result = await repository.existsById('missing');
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('resolveDefaultSchoolId', () => {
+    it('returns the id of the sole school row', async () => {
+      school.findFirst.mockResolvedValue({ id: 'school-1' });
+
+      const result = await repository.resolveDefaultSchoolId();
+
+      expect(school.findFirst).toHaveBeenCalledWith({
+        select: { id: true },
+      });
+      expect(result).toBe('school-1');
+    });
+
+    it('returns null when no school exists', async () => {
+      school.findFirst.mockResolvedValue(null);
+
+      const result = await repository.resolveDefaultSchoolId();
+
+      expect(result).toBeNull();
     });
   });
 });

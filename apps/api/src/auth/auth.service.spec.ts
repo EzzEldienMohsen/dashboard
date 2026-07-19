@@ -19,7 +19,7 @@ import {
 import { EventQueueService } from '../queues/event-queue.service';
 import { EmailAlreadyExistsException } from '../common/exceptions/email-already-exists.exception';
 import { InvalidCredentialsException } from '../common/exceptions/invalid-credentials.exception';
-import { SchoolNotFoundException } from '../common/exceptions/school-not-found.exception';
+import { SchoolNotConfiguredException } from '../common/exceptions/school-not-configured.exception';
 import type { RegisterDto } from './dto/register.dto';
 import type { LoginDto } from './dto/login.dto';
 
@@ -36,6 +36,7 @@ describe('AuthService', () => {
     findById: jest.fn(),
     findMany: jest.fn(),
     existsById: jest.fn(),
+    resolveDefaultSchoolId: jest.fn(),
   };
   const hasher: jest.Mocked<IPasswordHasher> = {
     hash: jest.fn(),
@@ -81,7 +82,6 @@ describe('AuthService', () => {
   describe('register', () => {
     const registerDto: RegisterDto = {
       role: 'TEACHER',
-      schoolId: 'school-1',
       name: 'Jane Doe',
       email: 'jane@example.com',
       phone: '+1-555-0110',
@@ -92,7 +92,7 @@ describe('AuthService', () => {
 
     it('creates a user and returns an access token', async () => {
       users.existsByEmail.mockResolvedValue(false);
-      schools.existsById.mockResolvedValue(true);
+      schools.resolveDefaultSchoolId.mockResolvedValue('school-1');
       hasher.hash.mockResolvedValue('hashed-password');
       users.create.mockResolvedValue(existingUser);
       tokens.sign.mockReturnValue('signed-jwt');
@@ -107,13 +107,13 @@ describe('AuthService', () => {
         name: registerDto.name,
         phone: registerDto.phone,
         country: registerDto.country,
-        schoolId: registerDto.schoolId,
+        schoolId: 'school-1',
       });
       expect(tokens.sign).toHaveBeenCalledWith({
         sub: existingUser.id,
         email: existingUser.email,
         role: existingUser.role,
-        schoolId: registerDto.schoolId,
+        schoolId: 'school-1',
       });
       expect(result.accessToken).toBe('signed-jwt');
       expect(result.user.email).toBe(existingUser.email);
@@ -124,7 +124,7 @@ describe('AuthService', () => {
 
     it('queues a user.register audit event on success', async () => {
       users.existsByEmail.mockResolvedValue(false);
-      schools.existsById.mockResolvedValue(true);
+      schools.resolveDefaultSchoolId.mockResolvedValue('school-1');
       hasher.hash.mockResolvedValue('hashed-password');
       users.create.mockResolvedValue(existingUser);
       tokens.sign.mockReturnValue('signed-jwt');
@@ -143,7 +143,7 @@ describe('AuthService', () => {
 
     it('still succeeds when queueing the audit event fails', async () => {
       users.existsByEmail.mockResolvedValue(false);
-      schools.existsById.mockResolvedValue(true);
+      schools.resolveDefaultSchoolId.mockResolvedValue('school-1');
       hasher.hash.mockResolvedValue('hashed-password');
       users.create.mockResolvedValue(existingUser);
       tokens.sign.mockReturnValue('signed-jwt');
@@ -163,12 +163,12 @@ describe('AuthService', () => {
       expect(users.create).not.toHaveBeenCalled();
     });
 
-    it('throws SchoolNotFoundException when the schoolId does not exist', async () => {
+    it('throws SchoolNotConfiguredException when no school is configured', async () => {
       users.existsByEmail.mockResolvedValue(false);
-      schools.existsById.mockResolvedValue(false);
+      schools.resolveDefaultSchoolId.mockResolvedValue(null);
 
       await expect(service.register(registerDto)).rejects.toBeInstanceOf(
-        SchoolNotFoundException,
+        SchoolNotConfiguredException,
       );
       expect(users.create).not.toHaveBeenCalled();
     });

@@ -58,11 +58,11 @@ describe("getSchoolProfile", () => {
 
     expect(result).toMatchObject({
       id: "",
-      name: "School Dashboard",
-      mission: "Empowering schools with modern tools.",
-      foundedYear: 2020,
-      address: "N/A",
-      contactEmail: "info@example.com",
+      name: "Campus Dashboard",
+      mission: "",
+      foundedYear: 0,
+      address: "",
+      contactEmail: "",
       contactPhone: null,
     });
     // updatedAt is computed at module load time via `new Date().toISOString()`,

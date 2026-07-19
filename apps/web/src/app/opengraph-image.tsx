@@ -42,7 +42,7 @@ export default function OgImage() {
           textAlign: "center",
         }}
       >
-        School Dashboard
+        Campus Dashboard
       </div>
       <div
         style={{

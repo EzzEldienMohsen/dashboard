@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { StatCard } from "@/components/molecules/StatCard";
 import { getPublicStats } from "@/lib/api";
+import { StatsSectionMotion } from "./StatsSectionMotion";
 
 export async function StatsSection() {
   const [t, { schoolsCount, studentsCount, teachersCount }] = await Promise.all([
@@ -11,11 +11,13 @@ export async function StatsSection() {
   return (
     <section className="py-16">
       <h2 className="sr-only">{t("heading")}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <StatCard count={schoolsCount} label={t("schools")} />
-        <StatCard count={studentsCount} label={t("students")} />
-        <StatCard count={teachersCount} label={t("teachers")} />
-      </div>
+      <StatsSectionMotion
+        items={[
+          { count: schoolsCount, label: t("schools") },
+          { count: studentsCount, label: t("students") },
+          { count: teachersCount, label: t("teachers") },
+        ]}
+      />
     </section>
   );
 }

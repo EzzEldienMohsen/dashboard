@@ -4,11 +4,11 @@ import { apiFetch } from "./fetcher";
 
 const DEFAULT_SCHOOL_PROFILE: SchoolProfile = {
   id: "",
-  name: "School Dashboard",
-  mission: "Empowering schools with modern tools.",
-  foundedYear: 2020,
-  address: "N/A",
-  contactEmail: "info@example.com",
+  name: "Campus Dashboard",
+  mission: "",
+  foundedYear: 0,
+  address: "",
+  contactEmail: "",
   contactPhone: null,
   updatedAt: new Date().toISOString(),
 };

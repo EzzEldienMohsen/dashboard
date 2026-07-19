@@ -42,6 +42,19 @@ model SchoolProfile {
   updatedAt    DateTime @updatedAt
 }
 
+model Creator {
+  id           String   @id @default(cuid())
+  name         String
+  role         String
+  bio          String
+  skills       String[]
+  email        String?
+  githubUrl    String?
+  linkedinUrl  String?
+  portfolioUrl String?
+  updatedAt    DateTime @updatedAt
+}
+
 enum AnnouncementCategory {
   GENERAL
   EVENT

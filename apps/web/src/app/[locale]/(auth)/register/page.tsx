@@ -30,7 +30,7 @@ export default async function RegisterPage() {
     url: `${SITE_URL}/register`,
     isPartOf: {
       "@type": "WebSite",
-      name: "School Dashboard",
+      name: "Campus Dashboard",
       url: SITE_URL,
     },
   };

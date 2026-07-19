@@ -46,4 +46,11 @@ export class PrismaSchoolRepository implements ISchoolRepository {
     });
     return school !== null;
   }
+
+  async resolveDefaultSchoolId(): Promise<string | null> {
+    const school = await this.prisma.school.findFirst({
+      select: { id: true },
+    });
+    return school?.id ?? null;
+  }
 }

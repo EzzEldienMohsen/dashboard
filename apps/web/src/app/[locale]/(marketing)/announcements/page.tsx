@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { MarketingPageTemplate } from "@/components/templates/MarketingPageTemplate";
 import { AnnouncementsList } from "@/components/organisms/AnnouncementsList";
+import { FadeInSection } from "@/components/atoms/FadeInSection";
 import { getSchoolProfile, getAnnouncements } from "@/lib/api";
 import { ANNOUNCEMENTS_FETCH_LIMIT } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -40,11 +41,13 @@ export default async function AnnouncementsPage() {
       <JsonLd data={jsonLd} />
       <MarketingPageTemplate
         hero={
-          <section className="py-16 text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-base-content">
-              {t("hero.heading")}
-            </h1>
-          </section>
+          <FadeInSection delay={0}>
+            <section className="py-16 text-center">
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-base-content">
+                {t("hero.heading")}
+              </h1>
+            </section>
+          </FadeInSection>
         }
       >
         <Suspense
@@ -56,7 +59,9 @@ export default async function AnnouncementsPage() {
             </div>
           }
         >
-          <AnnouncementsList announcements={announcements} />
+          <FadeInSection delay={0.1}>
+            <AnnouncementsList announcements={announcements} />
+          </FadeInSection>
         </Suspense>
       </MarketingPageTemplate>
     </>

@@ -21,6 +21,7 @@ import { SchoolsModule } from './schools/schools.module';
 import { ClassesModule } from './classes/classes.module';
 import { StudentsModule } from './students/students.module';
 import { SchoolProfileModule } from './school-profile/school-profile.module';
+import { CreatorModule } from './creator/creator.module';
 import { AnnouncementsModule } from './announcements/announcements.module';
 import { PublicStatsModule } from './public-stats/public-stats.module';
 import { HealthModule } from './health/health.module';
@@ -64,6 +65,7 @@ function buildCacheStores(): KeyvRedis<unknown>[] | undefined {
     ClassesModule,
     StudentsModule,
     SchoolProfileModule,
+    CreatorModule,
     AnnouncementsModule,
     PublicStatsModule,
     HealthModule,
