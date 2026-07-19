@@ -1,7 +1,9 @@
 export interface SchoolProfile {
   id: string;
   name: string;
+  nameAr: string | null;
   mission: string;
+  missionAr: string | null;
   foundedYear: number;
   address: string;
   contactEmail: string;
@@ -12,7 +14,9 @@ export interface SchoolProfile {
 export interface Announcement {
   id: string;
   title: string;
+  titleAr: string | null;
   body: string;
+  bodyAr: string | null;
   category: string;
   publishedAt: string;
 }
@@ -33,8 +37,11 @@ export interface PublicStats {
 export interface Creator {
   id: string;
   name: string;
+  nameAr: string | null;
   role: string;
+  roleAr: string | null;
   bio: string;
+  bioAr: string | null;
   skills: string[];
   email: string | null;
   githubUrl: string | null;

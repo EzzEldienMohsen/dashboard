@@ -17,8 +17,11 @@ describe("CreatorSection", () => {
     getCreatorMock.mockResolvedValue({
       id: "1",
       name: "Ezz Eldien Deghedy",
+      nameAr: null,
       role: "Creator & Full-Stack Developer",
+      roleAr: null,
       bio: "Frontend-focused developer specializing in Next.js, React, and TypeScript.",
+      bioAr: null,
       skills: ["React.js", "Next.js"],
       email: "ezzmohsend@gmail.com",
       githubUrl: "https://github.com/EzzEldienMohsen",
@@ -52,8 +55,11 @@ describe("CreatorSection", () => {
     getCreatorMock.mockResolvedValue({
       id: "",
       name: "",
+      nameAr: null,
       role: "",
+      roleAr: null,
       bio: "",
+      bioAr: null,
       skills: [],
       email: null,
       githubUrl: null,

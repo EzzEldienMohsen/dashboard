@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { AppTopBar } from "./AppTopBar";
@@ -14,6 +15,11 @@ vi.mock("next-intl", () => ({
 vi.mock("@/i18n/navigation", () => ({
   usePathname: () => "/dashboard",
   useRouter: () => ({ replace: vi.fn() }),
+  Link: ({ href, children, ...props }: ComponentProps<"a">) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
 vi.mock("@/lib/theme/theme-context", () => ({
@@ -21,7 +27,7 @@ vi.mock("@/lib/theme/theme-context", () => ({
 }));
 
 describe("AppTopBar", () => {
-  it("renders the user email and role", async () => {
+  it("renders the user email and translated role label", async () => {
     const logoutAction = vi.fn();
 
     render(
@@ -29,7 +35,30 @@ describe("AppTopBar", () => {
     );
 
     expect(screen.getByText(/teacher@example.com/)).toBeInTheDocument();
-    expect(screen.getByText(/TEACHER/)).toBeInTheDocument();
+    expect(screen.getByText(/roleTeacher/)).toBeInTheDocument();
+    expect(screen.queryByText(/TEACHER/)).not.toBeInTheDocument();
+  });
+
+  it("translates the manager role label", async () => {
+    const logoutAction = vi.fn();
+
+    render(await AppTopBar({ userEmail: "a@b.com", role: "MANAGER", logoutAction }));
+
+    expect(screen.getByText(/roleManager/)).toBeInTheDocument();
+  });
+
+  it("renders links to every public marketing page", async () => {
+    const logoutAction = vi.fn();
+
+    render(await AppTopBar({ userEmail: "a@b.com", role: "MANAGER", logoutAction }));
+
+    expect(screen.getByRole("link", { name: "home" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "features" })).toHaveAttribute("href", "/features");
+    expect(screen.getByRole("link", { name: "about" })).toHaveAttribute("href", "/about");
+    expect(screen.getByRole("link", { name: "announcements" })).toHaveAttribute(
+      "href",
+      "/announcements",
+    );
   });
 
   it("renders the language switcher and theme toggle controls", async () => {

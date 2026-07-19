@@ -8,8 +8,11 @@ import type {
 const CREATOR_SELECT = {
   id: true,
   name: true,
+  nameAr: true,
   role: true,
+  roleAr: true,
   bio: true,
+  bioAr: true,
   skills: true,
   email: true,
   githubUrl: true,

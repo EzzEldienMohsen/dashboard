@@ -11,6 +11,10 @@ vi.mock("@/i18n/navigation", () => ({
   ),
 }));
 
+vi.mock("next-intl", () => ({
+  useLocale: () => "en",
+}));
+
 describe("AnnouncementCard", () => {
   it("renders title, category badge, and truncates a long body", () => {
     const longBody = "x".repeat(200);

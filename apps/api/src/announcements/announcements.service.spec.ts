@@ -18,7 +18,9 @@ describe('AnnouncementsService', () => {
   const existingAnnouncement = {
     id: 'announcement-1',
     title: 'Mid-term exam schedule released',
+    titleAr: 'الإعلان عن جدول اختبارات منتصف الفصل الدراسي',
     body: 'Please check the exam hall notice board.',
+    bodyAr: 'يُرجى مراجعة لوحة الإعلانات الخاصة بقاعة الاختبار.',
     category: 'EXAM' as const,
     publishedAt: new Date('2024-01-01T00:00:00.000Z'),
   };

@@ -5,6 +5,7 @@ import { AuthPageTemplate } from "@/components/templates/AuthPageTemplate";
 import { LoginForm } from "@/components/organisms/LoginForm";
 import { loginAction } from "../actions";
 import { initialAuthActionState } from "../action-state";
+import { getSchoolProfile } from "@/lib/api";
 import { SITE_URL } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -19,7 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LoginPage() {
-  const t = await getTranslations("auth.login");
+  const [t, { name: schoolName }] = await Promise.all([
+    getTranslations("auth.login"),
+    getSchoolProfile(),
+  ]);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -28,7 +32,7 @@ export default async function LoginPage() {
     url: `${SITE_URL}/login`,
     isPartOf: {
       "@type": "WebSite",
-      name: "Campus Dashboard",
+      name: schoolName,
       url: SITE_URL,
     },
   };

@@ -10,7 +10,9 @@ vi.mock("next-intl/server", () => ({
 const profile: SchoolProfile = {
   id: "1",
   name: "Greenwood High",
+  nameAr: null,
   mission: "Empower every learner.",
+  missionAr: null,
   foundedYear: 1998,
   address: "123 Main St",
   contactEmail: "info@greenwood.edu",

@@ -7,7 +7,9 @@ export type SchoolProfileEntity = Pick<
   SchoolProfile,
   | 'id'
   | 'name'
+  | 'nameAr'
   | 'mission'
+  | 'missionAr'
   | 'foundedYear'
   | 'address'
   | 'contactEmail'

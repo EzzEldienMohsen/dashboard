@@ -23,8 +23,12 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const [locale, announcement] = await Promise.all([getLocale(), getAnnouncementById(id)]);
-  if (!announcement) return { title: "Announcement" };
+  const [locale, t, announcement] = await Promise.all([
+    getLocale(),
+    getTranslations("announcementDetail"),
+    getAnnouncementById(id),
+  ]);
+  if (!announcement) return { title: t("notFoundTitle") };
   const description = announcement.body.slice(0, 160).trimEnd();
   return buildPageMetadata({
     title: announcement.title,
@@ -41,8 +45,12 @@ export default async function AnnouncementDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const t = await getTranslations("announcementDetail");
-  const tAnn = await getTranslations("announcements");
+  const [locale, t, tAnn, tNav] = await Promise.all([
+    getLocale(),
+    getTranslations("announcementDetail"),
+    getTranslations("announcements"),
+    getTranslations("nav"),
+  ]);
 
   const announcement = await getAnnouncementById(id);
 
@@ -51,7 +59,7 @@ export default async function AnnouncementDetailPage({
   }
 
   const badgeClass = getCategoryBadgeClass(announcement.category);
-  const date = new Date(announcement.publishedAt).toLocaleDateString(undefined, {
+  const date = new Date(announcement.publishedAt).toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -69,7 +77,7 @@ export default async function AnnouncementDetailPage({
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "/" },
+        { "@type": "ListItem", position: 1, name: tNav("home"), item: "/" },
         { "@type": "ListItem", position: 2, name: tAnn("hero.heading"), item: "/announcements" },
         { "@type": "ListItem", position: 3, name: announcement.title },
       ],
@@ -82,7 +90,7 @@ export default async function AnnouncementDetailPage({
       <div className="w-[90%] max-w-3xl mx-auto py-12">
         <MarketingBreadcrumbs
           crumbs={[
-            { label: "Home", href: "/" },
+            { label: tNav("home"), href: "/" },
             { label: tAnn("hero.heading"), href: "/announcements" },
             { label: announcement.title },
           ]}

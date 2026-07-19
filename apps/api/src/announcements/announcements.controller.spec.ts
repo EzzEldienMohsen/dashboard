@@ -30,7 +30,9 @@ describe('AnnouncementsController', () => {
     const announcement = {
       id: 'announcement-1',
       title: 'Mid-term exam schedule released',
+      titleAr: 'الإعلان عن جدول اختبارات منتصف الفصل الدراسي',
       body: 'Check the notice board.',
+      bodyAr: 'يُرجى مراجعة لوحة الإعلانات.',
       category: 'EXAM' as const,
       publishedAt: new Date('2024-01-01T00:00:00.000Z'),
     };

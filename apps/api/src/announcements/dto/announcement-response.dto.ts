@@ -5,7 +5,9 @@ import type { $Enums } from '../../../generated/prisma/client.js';
 export class AnnouncementResponseDto {
   @Expose() id!: string;
   @Expose() title!: string;
+  @Expose() titleAr!: string | null;
   @Expose() body!: string;
+  @Expose() bodyAr!: string | null;
   @Expose() category!: $Enums.AnnouncementCategory;
   @Expose() publishedAt!: Date;
 

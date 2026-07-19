@@ -58,8 +58,11 @@ async function seedSchoolProfile() {
   await prisma.schoolProfile.create({
     data: {
       name: 'Riverside International School',
+      nameAr: 'مدرسة ريفرسايد الدولية',
       mission:
         'To nurture curious, confident learners through a balanced, inclusive education that prepares every student for lifelong success.',
+      missionAr:
+        'نسعى إلى رعاية متعلمين واثقين وشغوفين بالمعرفة من خلال تعليم متوازن وشامل يُعِدّ كل طالب للنجاح مدى الحياة.',
       foundedYear: 1998,
       address: '42 Riverside Avenue, Springfield',
       contactEmail: 'info@riverside-school.example',
@@ -72,8 +75,12 @@ async function seedCreator() {
   await prisma.creator.create({
     data: {
       name: 'Ezz Eldien Deghedy',
+      nameAr: 'عز الدين دغيدي',
       role: 'Creator & Full-Stack Developer',
+      roleAr: 'المُنشئ ومطوّر البرمجيات المتكامل',
       bio: "Frontend-focused developer specializing in Next.js, React, and TypeScript, with full MERN and NestJS/Prisma full-stack range. Built this application's entire frontend and backend — from pixel-perfect, accessible UI to a NestJS/Prisma API layer — applying SOLID principles and modern rendering strategies throughout.",
+      bioAr:
+        'مطوّر واجهات أمامية متخصص في Next.js وReact وTypeScript، ولديه خبرة متكاملة في مكدّس MERN وNestJS/Prisma. قام ببناء الواجهة الأمامية والخلفية لهذا التطبيق بالكامل — من تصميم واجهة مستخدم دقيقة وسهلة الوصول إلى طبقة API مبنية على NestJS وPrisma — مع تطبيق مبادئ SOLID واستراتيجيات العرض الحديثة في جميع الأنحاء.',
       skills: [
         'React.js',
         'Next.js',
@@ -94,86 +101,297 @@ async function seedCreator() {
   });
 }
 
+/** Small hand-written Arabic filler bank — the Arabic counterpart to faker.lorem for bodyAr. */
+const ARABIC_FILLER_SENTENCES = [
+  'تحرص إدارة المدرسة على إبقاء جميع الأسر على اطلاع دائم بآخر المستجدات.',
+  'يُرجى من أولياء الأمور والطلاب مراجعة التفاصيل الكاملة عبر بوابة المدرسة الإلكترونية.',
+  'ستكون فرق العمل المعنية متاحة للإجابة عن أي استفسارات خلال ساعات الدوام الرسمي.',
+  'نشكر جميع أفراد المجتمع المدرسي على تعاونهم المستمر ودعمهم لهذه المبادرة.',
+  'سيتم إرسال تحديثات إضافية فور توفر أي معلومات جديدة بهذا الخصوص.',
+  'تلتزم المدرسة بأعلى معايير السلامة والجودة في تنظيم جميع أنشطتها وفعالياتها.',
+  'يمكن التواصل مع مكتب الشؤون الطلابية لمزيد من التفاصيل أو للمساعدة في أي خطوة.',
+  'نأمل أن يحظى هذا الإجراء برضا جميع الأطراف المعنية من الطلاب وأولياء الأمور والمعلمين.',
+  'كالعادة، تضع المدرسة مصلحة الطلاب وسلامتهم في مقدمة أولوياتها عند اتخاذ أي قرار.',
+  'سيتم تحديث هذا الإعلان في حال طرأ أي تغيير على التفاصيل المذكورة أعلاه.',
+];
+
+function arabicFillerParagraph(): string {
+  const sentenceCount = 3 + Math.floor(Math.random() * 3);
+  const sentences: string[] = [];
+  for (let i = 0; i < sentenceCount; i++) {
+    sentences.push(
+      ARABIC_FILLER_SENTENCES[
+        Math.floor(Math.random() * ARABIC_FILLER_SENTENCES.length)
+      ],
+    );
+  }
+  return sentences.join(' ');
+}
+
 async function seedAnnouncements() {
   const categories = Object.values($Enums.AnnouncementCategory);
-  const titlesByCategory: Record<string, string[]> = {
-    GENERAL: [
-      'Library hours extended for exam season',
-      'New cafeteria menu now available',
-      "School newsletter — this month's highlights",
-      'Uniform policy reminder for winter term',
-      'New textbook list published for next term',
-      'Parent-teacher portal gets a fresh update',
-      'Bus route changes effective next Monday',
-      'Library digitization project now complete',
-      'Lost and found items to be donated next week',
-      'New student ambassadors program launching',
-      'Cafeteria introduces weekly vegetarian day',
-      'School supply drive for local shelters',
-    ],
-    EVENT: [
-      'Annual Science Fair — save the date',
-      'Inter-school football tournament kicks off',
-      'Spring concert rehearsals begin next week',
-      'Career day guest speakers announced',
-      'Annual book fair opens in the main hall',
-      'Alumni reunion weekend details released',
-      'Talent show auditions open to all grades',
-      'Graduation ceremony rehearsal schedule posted',
-      'Robotics club demo day open to parents',
-      'International culture week kicks off Monday',
-      'Art exhibition featuring student work this Friday',
-      'Chess club regional tournament sign-ups open',
-    ],
-    EXAM: [
-      'Mid-term exam schedule released',
-      'Final exam seating arrangements posted',
-      'Make-up exam registration now open',
-      'Exam hall guidelines for students',
-      'Updated resit policy for the spring term',
-      'Online mock exams available this weekend',
-      'Results publication date confirmed',
-      'Exam stress workshop for graduating students',
-      'Calculator policy reminder for math finals',
-      'Extra revision sessions added before finals',
-      'Exam accommodation requests due this Friday',
-      'Practice papers now available in the portal',
-    ],
-    HOLIDAY: [
-      'School closed for national holiday',
-      'Winter break schedule confirmed',
-      'Half-day dismissal ahead of long weekend',
-      'Holiday homework packets available online',
-      'Religious holiday observance — campus closed',
-      'Teacher in-service day — no classes',
-      'Spring break dates confirmed for all grades',
-      'National Day closure notice',
-      'Eid holiday schedule and makeup days',
-      'Optional holiday enrichment camp registration open',
-      'Long weekend transport schedule change',
-      'End-of-term holiday assembly details',
-    ],
-    URGENT: [
-      'Early dismissal today due to weather',
-      'Temporary road closure affects pickup/drop-off',
-      'Immediate action needed: contact info update',
-      'Health advisory from the school nurse',
-      'Scheduled power outage affecting afternoon classes',
-      'Lockdown drill scheduled for this Thursday',
-      'Allergy alert: please review the updated list',
-      'Local transport strike may affect commute times',
-      'Seasonal flu advisory from the school clinic',
-      'Temporary Wi-Fi outage in the science building',
-      'Reminder: update emergency contact details today',
-      'Road works near the main gate this week',
-    ],
-  };
+  const titlesByCategory: Record<string, { title: string; titleAr: string }[]> =
+    {
+      GENERAL: [
+        {
+          title: 'Library hours extended for exam season',
+          titleAr: 'تمديد ساعات عمل المكتبة خلال موسم الاختبارات',
+        },
+        {
+          title: 'New cafeteria menu now available',
+          titleAr: 'قائمة طعام جديدة متاحة الآن في الكافتيريا',
+        },
+        {
+          title: "School newsletter — this month's highlights",
+          titleAr: 'نشرة المدرسة — أبرز أحداث هذا الشهر',
+        },
+        {
+          title: 'Uniform policy reminder for winter term',
+          titleAr: 'تذكير بسياسة الزي المدرسي لفصل الشتاء',
+        },
+        {
+          title: 'New textbook list published for next term',
+          titleAr: 'نشر قائمة الكتب الدراسية الجديدة للفصل القادم',
+        },
+        {
+          title: 'Parent-teacher portal gets a fresh update',
+          titleAr: 'تحديث جديد لبوابة أولياء الأمور والمعلمين',
+        },
+        {
+          title: 'Bus route changes effective next Monday',
+          titleAr: 'تغييرات في خطوط الحافلات اعتبارًا من الاثنين القادم',
+        },
+        {
+          title: 'Library digitization project now complete',
+          titleAr: 'اكتمال مشروع رقمنة المكتبة',
+        },
+        {
+          title: 'Lost and found items to be donated next week',
+          titleAr: 'التبرع بالمفقودات غير المُطالَب بها الأسبوع القادم',
+        },
+        {
+          title: 'New student ambassadors program launching',
+          titleAr: 'إطلاق برنامج جديد لسفراء الطلاب',
+        },
+        {
+          title: 'Cafeteria introduces weekly vegetarian day',
+          titleAr: 'الكافتيريا تُطلق يومًا نباتيًا أسبوعيًا',
+        },
+        {
+          title: 'School supply drive for local shelters',
+          titleAr: 'حملة لجمع المستلزمات المدرسية لدعم الملاجئ المحلية',
+        },
+      ],
+      EVENT: [
+        {
+          title: 'Annual Science Fair — save the date',
+          titleAr: 'معرض العلوم السنوي — احجز الموعد',
+        },
+        {
+          title: 'Inter-school football tournament kicks off',
+          titleAr: 'انطلاق بطولة كرة القدم بين المدارس',
+        },
+        {
+          title: 'Spring concert rehearsals begin next week',
+          titleAr: 'بدء بروفات حفل الربيع الموسيقي الأسبوع القادم',
+        },
+        {
+          title: 'Career day guest speakers announced',
+          titleAr: 'الإعلان عن ضيوف يوم المهن',
+        },
+        {
+          title: 'Annual book fair opens in the main hall',
+          titleAr: 'افتتاح معرض الكتاب السنوي في القاعة الرئيسية',
+        },
+        {
+          title: 'Alumni reunion weekend details released',
+          titleAr: 'الإعلان عن تفاصيل عطلة لقاء الخريجين',
+        },
+        {
+          title: 'Talent show auditions open to all grades',
+          titleAr: 'فتح باب التجارب لعرض المواهب أمام جميع الصفوف',
+        },
+        {
+          title: 'Graduation ceremony rehearsal schedule posted',
+          titleAr: 'نشر جدول بروفات حفل التخرج',
+        },
+        {
+          title: 'Robotics club demo day open to parents',
+          titleAr: 'يوم عرض نادي الروبوتات مفتوح لأولياء الأمور',
+        },
+        {
+          title: 'International culture week kicks off Monday',
+          titleAr: 'انطلاق أسبوع الثقافات الدولية يوم الاثنين',
+        },
+        {
+          title: 'Art exhibition featuring student work this Friday',
+          titleAr: 'معرض فني لأعمال الطلاب هذا الجمعة',
+        },
+        {
+          title: 'Chess club regional tournament sign-ups open',
+          titleAr: 'فتح التسجيل في بطولة الشطرنج الإقليمية لنادي الشطرنج',
+        },
+      ],
+      EXAM: [
+        {
+          title: 'Mid-term exam schedule released',
+          titleAr: 'الإعلان عن جدول اختبارات منتصف الفصل الدراسي',
+        },
+        {
+          title: 'Final exam seating arrangements posted',
+          titleAr: 'نشر ترتيبات الجلوس للاختبارات النهائية',
+        },
+        {
+          title: 'Make-up exam registration now open',
+          titleAr: 'فتح باب التسجيل لاختبارات الإعادة',
+        },
+        {
+          title: 'Exam hall guidelines for students',
+          titleAr: 'إرشادات قاعة الاختبار للطلاب',
+        },
+        {
+          title: 'Updated resit policy for the spring term',
+          titleAr: 'تحديث سياسة إعادة الاختبار لفصل الربيع',
+        },
+        {
+          title: 'Online mock exams available this weekend',
+          titleAr: 'اختبارات تجريبية إلكترونية متاحة نهاية هذا الأسبوع',
+        },
+        {
+          title: 'Results publication date confirmed',
+          titleAr: 'تأكيد موعد إعلان النتائج',
+        },
+        {
+          title: 'Exam stress workshop for graduating students',
+          titleAr: 'ورشة عمل للتعامل مع ضغط الاختبارات لطلاب التخرج',
+        },
+        {
+          title: 'Calculator policy reminder for math finals',
+          titleAr:
+            'تذكير بسياسة استخدام الآلة الحاسبة في اختبارات الرياضيات النهائية',
+        },
+        {
+          title: 'Extra revision sessions added before finals',
+          titleAr: 'إضافة حصص مراجعة إضافية قبل الاختبارات النهائية',
+        },
+        {
+          title: 'Exam accommodation requests due this Friday',
+          titleAr: 'آخر موعد لطلبات التيسيرات الخاصة بالاختبارات هذا الجمعة',
+        },
+        {
+          title: 'Practice papers now available in the portal',
+          titleAr: 'أوراق تدريبية متاحة الآن على البوابة الإلكترونية',
+        },
+      ],
+      HOLIDAY: [
+        {
+          title: 'School closed for national holiday',
+          titleAr: 'إغلاق المدرسة بمناسبة العطلة الوطنية',
+        },
+        {
+          title: 'Winter break schedule confirmed',
+          titleAr: 'تأكيد جدول عطلة الشتاء',
+        },
+        {
+          title: 'Half-day dismissal ahead of long weekend',
+          titleAr: 'انصراف نصف يوم قبل عطلة نهاية الأسبوع الطويلة',
+        },
+        {
+          title: 'Holiday homework packets available online',
+          titleAr: 'حزم الواجبات المنزلية للعطلة متاحة إلكترونيًا',
+        },
+        {
+          title: 'Religious holiday observance — campus closed',
+          titleAr: 'مراعاة العطلة الدينية — إغلاق الحرم المدرسي',
+        },
+        {
+          title: 'Teacher in-service day — no classes',
+          titleAr: 'يوم تدريب للمعلمين — لا دراسة',
+        },
+        {
+          title: 'Spring break dates confirmed for all grades',
+          titleAr: 'تأكيد مواعيد عطلة الربيع لجميع الصفوف',
+        },
+        {
+          title: 'National Day closure notice',
+          titleAr: 'إشعار بالإغلاق بمناسبة اليوم الوطني',
+        },
+        {
+          title: 'Eid holiday schedule and makeup days',
+          titleAr: 'جدول عطلة العيد وأيام التعويض',
+        },
+        {
+          title: 'Optional holiday enrichment camp registration open',
+          titleAr: 'فتح التسجيل في المعسكر الإثرائي الاختياري خلال العطلة',
+        },
+        {
+          title: 'Long weekend transport schedule change',
+          titleAr: 'تغيير جدول النقل خلال عطلة نهاية الأسبوع الطويلة',
+        },
+        {
+          title: 'End-of-term holiday assembly details',
+          titleAr: 'تفاصيل طابور نهاية الفصل الدراسي قبل العطلة',
+        },
+      ],
+      URGENT: [
+        {
+          title: 'Early dismissal today due to weather',
+          titleAr: 'انصراف مبكر اليوم بسبب سوء الأحوال الجوية',
+        },
+        {
+          title: 'Temporary road closure affects pickup/drop-off',
+          titleAr: 'إغلاق مؤقت للطريق يؤثر على أوقات الاصطحاب والتوصيل',
+        },
+        {
+          title: 'Immediate action needed: contact info update',
+          titleAr: 'إجراء عاجل مطلوب: تحديث بيانات التواصل',
+        },
+        {
+          title: 'Health advisory from the school nurse',
+          titleAr: 'تنبيه صحي من ممرضة المدرسة',
+        },
+        {
+          title: 'Scheduled power outage affecting afternoon classes',
+          titleAr: 'انقطاع مجدول للكهرباء يؤثر على حصص فترة الظهيرة',
+        },
+        {
+          title: 'Lockdown drill scheduled for this Thursday',
+          titleAr: 'تدريب إغلاق أمني مقرر هذا الخميس',
+        },
+        {
+          title: 'Allergy alert: please review the updated list',
+          titleAr: 'تنبيه حساسية: يُرجى مراجعة القائمة المُحدَّثة',
+        },
+        {
+          title: 'Local transport strike may affect commute times',
+          titleAr: 'إضراب في المواصلات المحلية قد يؤثر على مواعيد التنقل',
+        },
+        {
+          title: 'Seasonal flu advisory from the school clinic',
+          titleAr: 'تنبيه من عيادة المدرسة بشأن إنفلونزا الموسم',
+        },
+        {
+          title: 'Temporary Wi-Fi outage in the science building',
+          titleAr: 'انقطاع مؤقت للإنترنت اللاسلكي في مبنى العلوم',
+        },
+        {
+          title: 'Reminder: update emergency contact details today',
+          titleAr: 'تذكير: يُرجى تحديث بيانات التواصل في حالات الطوارئ اليوم',
+        },
+        {
+          title: 'Road works near the main gate this week',
+          titleAr: 'أعمال طرق بالقرب من البوابة الرئيسية هذا الأسبوع',
+        },
+      ],
+    };
 
   const rows = categories.flatMap((category) =>
-    titlesByCategory[category].map((title) => ({
+    titlesByCategory[category].map(({ title, titleAr }) => ({
       id: randomUUID(),
       title,
+      titleAr,
       body: faker.lorem.paragraphs({ min: 1, max: 2 }),
+      bodyAr: arabicFillerParagraph(),
       category,
       publishedAt: faker.date.recent({ days: ANNOUNCEMENT_DATE_SPREAD_DAYS }),
     })),

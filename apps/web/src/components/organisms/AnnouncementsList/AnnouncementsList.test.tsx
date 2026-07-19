@@ -14,27 +14,34 @@ vi.mock("@/i18n/navigation", () => ({
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
+  useLocale: () => "en",
 }));
 
 const announcements: Announcement[] = [
   {
     id: "1",
     title: "Sports Day",
+    titleAr: null,
     body: "Body 1",
+    bodyAr: null,
     category: "EVENT",
     publishedAt: "2026-01-01T00:00:00.000Z",
   },
   {
     id: "2",
     title: "Exam Schedule",
+    titleAr: null,
     body: "Body 2",
+    bodyAr: null,
     category: "EXAM",
     publishedAt: "2026-01-02T00:00:00.000Z",
   },
   {
     id: "3",
     title: "General Notice",
+    titleAr: null,
     body: "Body 3",
+    bodyAr: null,
     category: "GENERAL",
     publishedAt: "2026-01-03T00:00:00.000Z",
   },

@@ -7,8 +7,11 @@ export type CreatorEntity = Pick<
   Creator,
   | 'id'
   | 'name'
+  | 'nameAr'
   | 'role'
+  | 'roleAr'
   | 'bio'
+  | 'bioAr'
   | 'skills'
   | 'email'
   | 'githubUrl'

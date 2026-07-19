@@ -34,7 +34,9 @@ model User {
 model SchoolProfile {
   id           String   @id @default(cuid())
   name         String
+  nameAr       String?
   mission      String
+  missionAr    String?
   foundedYear  Int
   address      String
   contactEmail String
@@ -45,8 +47,11 @@ model SchoolProfile {
 model Creator {
   id           String   @id @default(cuid())
   name         String
+  nameAr       String?
   role         String
+  roleAr       String?
   bio          String
+  bioAr        String?
   skills       String[]
   email        String?
   githubUrl    String?
@@ -66,7 +71,9 @@ enum AnnouncementCategory {
 model Announcement {
   id          String               @id @default(cuid())
   title       String
+  titleAr     String?
   body        String
+  bodyAr      String?
   category    AnnouncementCategory
   publishedAt DateTime             @default(now())
 

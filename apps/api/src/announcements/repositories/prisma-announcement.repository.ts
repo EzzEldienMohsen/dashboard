@@ -14,7 +14,9 @@ import type { $Enums } from '../../../generated/prisma/client.js';
 const ANNOUNCEMENT_SELECT = {
   id: true,
   title: true,
+  titleAr: true,
   body: true,
+  bodyAr: true,
   category: true,
   publishedAt: true,
 } as const;

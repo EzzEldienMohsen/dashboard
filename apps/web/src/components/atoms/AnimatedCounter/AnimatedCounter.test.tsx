@@ -6,6 +6,10 @@ vi.mock("framer-motion", () => ({
   useInView: () => true,
 }));
 
+vi.mock("next-intl", () => ({
+  useLocale: () => "en",
+}));
+
 describe("AnimatedCounter", () => {
   beforeEach(() => {
     // Resolve the animation in a single synchronous frame by reporting a

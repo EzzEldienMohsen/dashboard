@@ -4,7 +4,9 @@ import { Exclude, Expose, plainToInstance } from 'class-transformer';
 export class SchoolProfileResponseDto {
   @Expose() id!: string;
   @Expose() name!: string;
+  @Expose() nameAr!: string | null;
   @Expose() mission!: string;
+  @Expose() missionAr!: string | null;
   @Expose() foundedYear!: number;
   @Expose() address!: string;
   @Expose() contactEmail!: string;

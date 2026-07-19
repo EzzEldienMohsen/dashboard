@@ -4,8 +4,11 @@ import { Exclude, Expose, plainToInstance } from 'class-transformer';
 export class CreatorResponseDto {
   @Expose() id!: string;
   @Expose() name!: string;
+  @Expose() nameAr!: string | null;
   @Expose() role!: string;
+  @Expose() roleAr!: string | null;
   @Expose() bio!: string;
+  @Expose() bioAr!: string | null;
   @Expose() skills!: string[];
   @Expose() email!: string | null;
   @Expose() githubUrl!: string | null;

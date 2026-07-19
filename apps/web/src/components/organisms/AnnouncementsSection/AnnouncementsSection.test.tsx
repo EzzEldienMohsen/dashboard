@@ -8,6 +8,10 @@ vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn().mockResolvedValue((key: string) => key),
 }));
 
+vi.mock("next-intl", () => ({
+  useLocale: () => "en",
+}));
+
 vi.mock("@/i18n/navigation", () => ({
   Link: ({ href, children, ...props }: ComponentProps<"a">) => (
     <a href={href} {...props}>
@@ -21,14 +25,18 @@ const data: PaginatedAnnouncements = {
     {
       id: "1",
       title: "Sports Day",
+      titleAr: null,
       body: "Body",
+      bodyAr: null,
       category: "EVENT",
       publishedAt: "2026-01-01T00:00:00.000Z",
     },
     {
       id: "2",
       title: "Exam Notice",
+      titleAr: null,
       body: "Body2",
+      bodyAr: null,
       category: "EXAM",
       publishedAt: "2026-01-02T00:00:00.000Z",
     },

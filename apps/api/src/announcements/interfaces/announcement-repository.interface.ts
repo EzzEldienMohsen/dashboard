@@ -7,7 +7,7 @@ export const ANNOUNCEMENT_REPOSITORY = Symbol('ANNOUNCEMENT_REPOSITORY');
 /** Exactly the columns AnnouncementResponseDto exposes — repositories select no more than this. */
 export type AnnouncementEntity = Pick<
   Announcement,
-  'id' | 'title' | 'body' | 'category' | 'publishedAt'
+  'id' | 'title' | 'titleAr' | 'body' | 'bodyAr' | 'category' | 'publishedAt'
 >;
 
 export interface FindManyAnnouncementsParams {

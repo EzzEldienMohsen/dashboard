@@ -12,7 +12,9 @@ describe('PrismaAnnouncementRepository', () => {
   const SELECT = {
     id: true,
     title: true,
+    titleAr: true,
     body: true,
+    bodyAr: true,
     category: true,
     publishedAt: true,
   };
@@ -26,7 +28,9 @@ describe('PrismaAnnouncementRepository', () => {
       const record = {
         id: 'announcement-1',
         title: 'Mid-term exam schedule released',
+        titleAr: 'الإعلان عن جدول اختبارات منتصف الفصل الدراسي',
         body: 'Please check the exam hall notice board.',
+        bodyAr: 'يُرجى مراجعة لوحة الإعلانات الخاصة بقاعة الاختبار.',
         category: 'EXAM',
         publishedAt: new Date('2024-01-01T00:00:00.000Z'),
       };
@@ -54,7 +58,9 @@ describe('PrismaAnnouncementRepository', () => {
         {
           id: 'announcement-1',
           title: 'A',
+          titleAr: 'أ',
           body: 'B',
+          bodyAr: 'ب',
           category: 'GENERAL',
           publishedAt: new Date('2024-01-01T00:00:00.000Z'),
         },
@@ -76,7 +82,9 @@ describe('PrismaAnnouncementRepository', () => {
           {
             id: 'announcement-1',
             title: 'A',
+            titleAr: 'أ',
             body: 'B',
+            bodyAr: 'ب',
             category: 'GENERAL',
             publishedAt: new Date('2024-01-01T00:00:00.000Z'),
           },

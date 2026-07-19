@@ -32,7 +32,7 @@ export function CountrySelect({
       name={name}
       placeholder={placeholder}
       options={options.map((option) => ({
-        value: option.label,
+        value: option.value,
         label: option.label,
       }))}
       {...rest}

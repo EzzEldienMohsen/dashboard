@@ -119,11 +119,13 @@
       "URGENT": "عاجل"
     },
     "empty": "لا توجد إعلانات حتى الآن.",
-    "readMore": "اقرأ المزيد ←"
+    "readMore": "اقرأ المزيد ←",
+    "filterLabel": "تصفية حسب الفئة"
   },
   "announcementDetail": {
     "backToList": "← العودة إلى الإعلانات",
-    "publishedOn": "نُشر في {date}"
+    "publishedOn": "نُشر في {date}",
+    "notFoundTitle": "الإعلان"
   },
   "stats": {
     "heading": "أرقامنا",
@@ -209,10 +211,15 @@
   "dashboard": {
     "nav": {
       "sidebarLabel": "التنقل في لوحة التحكم",
+      "publicNavLabel": "الصفحات العامة",
+      "openMenu": "فتح القائمة",
+      "closeMenu": "إغلاق القائمة",
       "overview": "نظرة عامة",
       "classes": "الفصول",
       "students": "الطلاب",
-      "logout": "تسجيل الخروج"
+      "logout": "تسجيل الخروج",
+      "roleManager": "مدير",
+      "roleTeacher": "معلم"
     },
     "overview": {
       "title": "نظرة عامة",
@@ -236,6 +243,14 @@
       "retry": "حاول مرة أخرى"
     },
     "loading": "جارٍ التحميل…"
+  },
+  "marketing": {
+    "error": {
+      "title": "حدث خطأ ما",
+      "message": "تعذّر تحميل هذه الصفحة. يرجى المحاولة مرة أخرى.",
+      "retry": "حاول مرة أخرى",
+      "backHome": "العودة إلى الرئيسية"
+    }
   },
   "schools": {
     "address": "العنوان",

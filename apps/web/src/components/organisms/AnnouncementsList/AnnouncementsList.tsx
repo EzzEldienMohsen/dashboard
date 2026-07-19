@@ -27,7 +27,7 @@ export function AnnouncementsList({ announcements }: AnnouncementsListProps) {
       <div
         role="tablist"
         className="flex flex-wrap gap-2 mb-8"
-        aria-label="Filter by category"
+        aria-label={t("filterLabel")}
       >
         {CATEGORIES.map((cat) => (
           <button

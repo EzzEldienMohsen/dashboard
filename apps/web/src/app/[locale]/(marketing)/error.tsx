@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import * as Sentry from "@sentry/nextjs";
 
@@ -11,6 +12,8 @@ export default function MarketingError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("marketing.error");
+
   useEffect(() => {
     Sentry.captureException(error, { extra: { digest: error.digest } });
   }, [error]);
@@ -33,16 +36,16 @@ export default function MarketingError({
           />
         </svg>
         <div className="text-start">
-          <p className="font-semibold">Something went wrong</p>
-          <p className="text-sm opacity-80">We couldn&apos;t load this page. Please try again.</p>
+          <p className="font-semibold">{t("title")}</p>
+          <p className="text-sm opacity-80">{t("message")}</p>
         </div>
       </div>
       <div className="flex gap-4 flex-wrap justify-center">
         <button type="button" onClick={reset} className="btn btn-primary">
-          Try again
+          {t("retry")}
         </button>
         <Link href="/" className="btn btn-ghost">
-          Back to home
+          {t("backHome")}
         </Link>
       </div>
     </div>

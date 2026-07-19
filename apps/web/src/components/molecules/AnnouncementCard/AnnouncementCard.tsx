@@ -1,3 +1,4 @@
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { getCategoryBadgeClass } from "@/lib/announcements/category";
 
@@ -20,9 +21,10 @@ export function AnnouncementCard({
   readMoreLabel,
   publishedAt,
 }: AnnouncementCardProps) {
+  const locale = useLocale();
   const badgeClass = getCategoryBadgeClass(category);
   const snippet = body.length > 140 ? body.slice(0, 140).trimEnd() + "…" : body;
-  const date = new Date(publishedAt).toLocaleDateString(undefined, {
+  const date = new Date(publishedAt).toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",

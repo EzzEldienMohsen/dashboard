@@ -16,8 +16,11 @@ describe('CreatorService', () => {
   const existingCreator = {
     id: 'creator-1',
     name: 'Ezz Eldien Deghedy',
+    nameAr: 'عز الدين دغيدي',
     role: 'Creator & Full-Stack Developer',
+    roleAr: 'المُنشئ ومطوّر البرمجيات المتكامل',
     bio: 'Frontend-focused developer specializing in Next.js, React, and TypeScript.',
+    bioAr: 'مطوّر واجهات أمامية متخصص في Next.js وReact وTypeScript.',
     skills: ['React.js', 'Next.js', 'TypeScript'],
     email: 'ezzmohsend@gmail.com',
     githubUrl: 'https://github.com/EzzEldienMohsen',

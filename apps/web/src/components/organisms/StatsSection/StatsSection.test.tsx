@@ -6,6 +6,10 @@ vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn().mockResolvedValue((key: string) => key),
 }));
 
+vi.mock("next-intl", () => ({
+  useLocale: () => "en",
+}));
+
 vi.mock("@/lib/api", () => ({
   getPublicStats: vi.fn().mockResolvedValue({
     schoolsCount: 12,

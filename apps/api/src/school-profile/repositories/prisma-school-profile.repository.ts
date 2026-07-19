@@ -8,7 +8,9 @@ import type {
 const SCHOOL_PROFILE_SELECT = {
   id: true,
   name: true,
+  nameAr: true,
   mission: true,
+  missionAr: true,
   foundedYear: true,
   address: true,
   contactEmail: true,

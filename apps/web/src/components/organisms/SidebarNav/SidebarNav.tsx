@@ -18,7 +18,7 @@ export async function SidebarNav({ role }: SidebarNavProps) {
   return (
     <nav
       aria-label={t("sidebarLabel")}
-      className="flex w-56 shrink-0 flex-col gap-1 border-e border-base-300 bg-base-100 p-4"
+      className="hidden w-56 shrink-0 flex-col gap-1 border-e border-base-300 bg-base-100 p-4 md:flex"
     >
       {links.map((link) => (
         <NavLink key={link.href} href={link.href}>

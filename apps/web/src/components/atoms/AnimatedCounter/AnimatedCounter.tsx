@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
+import { useLocale } from "next-intl";
 
 interface AnimatedCounterProps {
   value: number;
@@ -18,6 +19,7 @@ export function AnimatedCounter({ value, durationMs = 1200, className }: Animate
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
   const [display, setDisplay] = useState(0);
+  const locale = useLocale();
 
   useEffect(() => {
     if (!isInView) return;
@@ -40,7 +42,7 @@ export function AnimatedCounter({ value, durationMs = 1200, className }: Animate
 
   return (
     <span ref={ref} className={className}>
-      {display.toLocaleString()}
+      {display.toLocaleString(locale)}
     </span>
   );
 }

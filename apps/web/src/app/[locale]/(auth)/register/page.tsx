@@ -6,6 +6,7 @@ import { RegisterForm } from "@/components/organisms/RegisterForm";
 import { registerAction } from "../actions";
 import { initialAuthActionState } from "../action-state";
 import { getCountryOptions } from "@/lib/countries";
+import { getSchoolProfile } from "@/lib/api";
 import { SITE_URL } from "@/lib/config/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -20,8 +21,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RegisterPage() {
-  const t = await getTranslations("auth.register");
-  const countryOptions = getCountryOptions();
+  const [locale, t, { name: schoolName }] = await Promise.all([
+    getLocale(),
+    getTranslations("auth.register"),
+    getSchoolProfile(),
+  ]);
+  const countryOptions = getCountryOptions(locale);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -30,7 +35,7 @@ export default async function RegisterPage() {
     url: `${SITE_URL}/register`,
     isPartOf: {
       "@type": "WebSite",
-      name: "Campus Dashboard",
+      name: schoolName,
       url: SITE_URL,
     },
   };

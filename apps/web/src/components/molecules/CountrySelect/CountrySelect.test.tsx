@@ -3,8 +3,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { CountrySelect } from "./CountrySelect";
 
 const options = [
-  { code: "EG", label: "Egypt" },
-  { code: "US", label: "United States" },
+  { code: "EG", value: "Egypt", label: "Egypt" },
+  { code: "US", value: "United States", label: "United States" },
 ];
 
 describe("CountrySelect", () => {
@@ -36,7 +36,7 @@ describe("CountrySelect", () => {
     expect(select).toHaveAttribute("name", "birthCountry");
   });
 
-  it("updates its value when a country is selected (value is the label, not the code)", () => {
+  it("updates its value when a country is selected", () => {
     render(<CountrySelect options={options} placeholder="Select a country" />);
     const select = screen.getByRole("combobox") as HTMLSelectElement;
     fireEvent.change(select, { target: { value: "United States" } });
@@ -53,6 +53,15 @@ describe("CountrySelect", () => {
     );
     const select = screen.getByRole("combobox") as HTMLSelectElement;
     expect(select.value).toBe("Egypt");
+  });
+
+  it("submits the stable option.value even when the display label is localized", () => {
+    const localizedOptions = [{ code: "EG", value: "Egypt", label: "مصر" }];
+    render(<CountrySelect options={localizedOptions} placeholder="Select a country" />);
+    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: "Egypt" } });
+    expect(select.value).toBe("Egypt");
+    expect(screen.getByRole("option", { name: "مصر" })).toBeInTheDocument();
   });
 
   it("applies invalid styling and aria-invalid when invalid", () => {

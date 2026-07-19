@@ -119,11 +119,13 @@
       "URGENT": "Urgent"
     },
     "empty": "No announcements yet.",
-    "readMore": "Read more →"
+    "readMore": "Read more →",
+    "filterLabel": "Filter by category"
   },
   "announcementDetail": {
     "backToList": "← Back to Announcements",
-    "publishedOn": "Published on {date}"
+    "publishedOn": "Published on {date}",
+    "notFoundTitle": "Announcement"
   },
   "stats": {
     "heading": "Our numbers",
@@ -209,10 +211,15 @@
   "dashboard": {
     "nav": {
       "sidebarLabel": "Dashboard navigation",
+      "publicNavLabel": "Public pages",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
       "overview": "Overview",
       "classes": "Classes",
       "students": "Students",
-      "logout": "Log out"
+      "logout": "Log out",
+      "roleManager": "Manager",
+      "roleTeacher": "Teacher"
     },
     "overview": {
       "title": "Overview",
@@ -236,6 +243,14 @@
       "retry": "Try again"
     },
     "loading": "Loading…"
+  },
+  "marketing": {
+    "error": {
+      "title": "Something went wrong",
+      "message": "We couldn't load this page. Please try again.",
+      "retry": "Try again",
+      "backHome": "Back to home"
+    }
   },
   "schools": {
     "address": "Address",

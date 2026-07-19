@@ -9,8 +9,8 @@ vi.mock("next-intl", () => ({
 }));
 
 const countryOptions: CountryOption[] = [
-  { code: "EG", label: "Egypt" },
-  { code: "US", label: "United States" },
+  { code: "EG", value: "Egypt", label: "Egypt" },
+  { code: "US", value: "United States", label: "United States" },
 ];
 
 describe("RegisterForm", () => {

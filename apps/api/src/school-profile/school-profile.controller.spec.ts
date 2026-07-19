@@ -16,7 +16,9 @@ describe('SchoolProfileController', () => {
     const profile = {
       id: 'profile-1',
       name: 'Riverside International School',
+      nameAr: 'مدرسة ريفرسايد الدولية',
       mission: 'To nurture curious, confident learners.',
+      missionAr: 'نسعى إلى رعاية متعلمين واثقين وشغوفين بالمعرفة.',
       foundedYear: 1998,
       address: '42 Riverside Avenue',
       contactEmail: 'info@riverside.example',
