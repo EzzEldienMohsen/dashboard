@@ -10,6 +10,9 @@ WORKDIR /repo
 FROM base AS deps
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY apps/api/package.json apps/api/package.json
+COPY apps/api/prisma.config.ts apps/api/prisma.config.ts
+COPY apps/api/prisma/schema.prisma apps/api/prisma/schema.prisma
+COPY apps/api/scripts apps/api/scripts
 COPY packages/config/package.json packages/config/package.json
 COPY packages/shared-types/package.json packages/shared-types/package.json
 RUN pnpm install --frozen-lockfile
@@ -24,6 +27,9 @@ RUN pnpm --filter api build
 FROM base AS prod-deps
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY apps/api/package.json apps/api/package.json
+COPY apps/api/prisma.config.ts apps/api/prisma.config.ts
+COPY apps/api/prisma/schema.prisma apps/api/prisma/schema.prisma
+COPY apps/api/scripts apps/api/scripts
 COPY packages/config/package.json packages/config/package.json
 COPY packages/shared-types/package.json packages/shared-types/package.json
 RUN pnpm install --frozen-lockfile --prod --filter api...
