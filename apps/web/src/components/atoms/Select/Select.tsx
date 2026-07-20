@@ -26,26 +26,46 @@ export function Select({
   ...rest
 }: SelectProps) {
   return (
-    <select
-      className={cn(
-        fieldInputBaseClassName,
-        "appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22 fill=%22%2352525b%22><path fill-rule=%22evenodd%22 d=%22M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z%22 clip-rule=%22evenodd%22/></svg>')] bg-[length:1rem] bg-[right_0.75rem_center] rtl:bg-[left_0.75rem_center] bg-no-repeat pe-9",
-        invalid && "border-error focus:border-error focus:ring-error/30",
-        !invalid && "border-base-300",
-      )}
-      aria-invalid={invalid || undefined}
-      {...rest}
-    >
-      {placeholder ? (
-        <option value="" disabled>
-          {placeholder}
-        </option>
-      ) : null}
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative">
+      <select
+        className={cn(
+          fieldInputBaseClassName,
+          "appearance-none pe-9",
+          invalid && "border-error focus:border-error focus:ring-error/30",
+          !invalid && "border-base-300",
+        )}
+        aria-invalid={invalid || undefined}
+        {...rest}
+      >
+        {placeholder ? (
+          <option value="" disabled className="bg-base-100 text-base-content">
+            {placeholder}
+          </option>
+        ) : null}
+        {options.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+            className="bg-base-100 text-base-content"
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 20 20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-base-content/50"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5.25 7.5 10 12.25l4.75-4.75"
+        />
+      </svg>
+    </div>
   );
 }
