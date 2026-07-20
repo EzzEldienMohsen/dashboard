@@ -1,0 +1,31 @@
+name: Deploy Prisma migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/prisma/migrations/**"
+      - "apps/api/prisma/schema.prisma"
+  workflow_dispatch: {}
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply pending migrations
+        working-directory: apps/api
+        run: pnpm exec prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
