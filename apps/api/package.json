@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "node scripts/postinstall.js",
     "generate": "prisma generate",
-    "build": "nest build",
+    "build": "nest build && node scripts/copy-swagger-ui-assets.js",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"prisma/**/*.ts\"",
     "start": "nest start",

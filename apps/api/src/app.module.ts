@@ -61,7 +61,10 @@ function buildCacheStores(): KeyvRedis<unknown>[] | undefined {
         // nest-cli's asset copier places `src/i18n/**` at `<outDir>/i18n`,
         // not `<outDir>/src/i18n` — one level above this compiled module.
         path: join(__dirname, '..', 'i18n'),
-        watch: true,
+        // Serverless filesystems (Vercel/Lambda) are read-only for the
+        // deployed code volume — fs.watch() there can throw. Translation
+        // files are static build artifacts; no environment needs hot-reload.
+        watch: process.env.NODE_ENV !== 'production',
       },
       resolvers: [new AcceptLanguageResolver()],
     }),

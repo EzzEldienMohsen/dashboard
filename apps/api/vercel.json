@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "dist/{i18n,swagger-ui-assets}/**"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index.js" }]
+}
